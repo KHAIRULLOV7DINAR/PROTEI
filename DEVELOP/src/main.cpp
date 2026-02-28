@@ -5,6 +5,10 @@ int main(int argc, char** argv)
 {
     Config config;
 
+    //address sanitizer check
+    //int arr[4];
+    //arr[5] = 12;
+
     //Reading console string values
     try
     {
