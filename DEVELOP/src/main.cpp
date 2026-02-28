@@ -1,21 +1,32 @@
 #include "../include/console_menu.h"
+#include "../include/log.h"
 
 int main(int argc, char** argv)
 {
     Config config;
 
     //Reading console string values
-    int read_console_string_flag = read_console_string(argc, argv, config);
-    if(read_console_string_flag == 1)
+    try
     {
-        return read_console_string_flag;
+        read_console_string(argc, argv, config);
+    }
+    catch(std::exception& ex)
+    {
+        console_log(ex);
+
+        return 1;
     }
 
     //Parsing console string values
-    int parse_console_string_flag = parse_console_string(config);
-    if(parse_console_string_flag == 1)
+    try
     {
-        return parse_console_string_flag;
+        parse_console_string(config);
+    }
+    catch(std::exception& ex)
+    {
+        console_log(ex);
+
+        return 1;
     }
 
     //CLI-Menu
