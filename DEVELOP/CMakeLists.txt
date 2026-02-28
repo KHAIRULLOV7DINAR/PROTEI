@@ -8,6 +8,7 @@ include_directories("./include")
 
 set(SOURCE_LIST
     src/main.cpp
-    src/console_menu.cpp)
+    src/console_menu.cpp
+    src/log.cpp)
 
 add_executable(${PROJECT_NAME} ${SOURCE_LIST})
