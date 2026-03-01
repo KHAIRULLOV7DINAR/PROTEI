@@ -1,0 +1,55 @@
+user@Ubuntu:~/Desktop/DEVELOP/PROTEI/DEVELOP/build$ ./HOME_TASK -a 1.1.1.1 -L myLib
+
+Enter one of the following commands:
+Name - name for the program;
+Type - type of the vector;
+Vector - 4-d int vector;
+Exit - exit from the menu;
+Console - show enetered console string values;
+Menu - show entered menu values
+
+Warning! No multiple values are allowed in one string except for 4-d vector values! (cin.ignore used).
+
+Enter new command:
+
+type
+
+Enter type for vector:
+
+int
+
+Type for the vector was entered.
+
+Enter new command:
+
+vector
+
+Enter 4-d int vector:
+
+Enter remaining 4 values for vector.
+
+123 23a3 234 2 
+Enter remaining 3 values for vector.
+
+ERROR:
+Sun Mar  1 16:29:33 2026
+Invalid number for vector!
+
+
+Enter remaining 3 values for vector.
+
+234 2 5
+Enter remaining 2 values for vector.
+
+Enter remaining 1 values for vector.
+
+
+Vector was entered.
+
+Enter new command:
+
+exit
+
+Exit from the menu
+
+user@Ubuntu:~/Desktop/DEVELOP/PROTEI/DEVELOP/build$ 

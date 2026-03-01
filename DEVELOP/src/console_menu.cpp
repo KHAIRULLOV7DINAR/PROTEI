@@ -115,6 +115,17 @@ void parse_console_string(Config& config)
 //===============================================
 //MENU FUNCTIONS
 //===============================================
+void parse_command(std::string& command)
+{
+    std::string result;
+    for (char c : command) {
+        if (std::isalnum(static_cast<unsigned char>(c)))
+        {
+            result += std::tolower(static_cast<unsigned char>(c));
+        }
+    }
+    command = result;
+}
 
 void input_name(std::string& name)
 {
@@ -154,6 +165,85 @@ void input_type(Config& config)
     std::cout << "\nType for the vector was entered.\n" << std::endl; 
 }
 
+void check_W(Config& config)
+{
+    if(config.type == "int")
+    {
+        auto* vec = dynamic_cast<Config::TypedVector<int>*>(config.vect.get());
+        if (vec && vec->data.size() > 3 && vec->data[3] == 0)
+        {
+            throw std::invalid_argument("W-component of vector equals 0!");
+        }
+    }
+    else if(config.type == "float")
+    {
+        auto* vec = dynamic_cast<Config::TypedVector<float>*>(config.vect.get());
+        if (vec && vec->data.size() > 3 && vec->data[3] == 0.0f)
+        {
+            throw std::invalid_argument("W-component of vector equals 0!");
+        }
+    }
+    else if (config.type == "double")
+    {
+        auto* vec = dynamic_cast<Config::TypedVector<double>*>(config.vect.get());
+        if (vec && vec->data.size() > 3 && vec->data[3] == 0.0)
+        {
+            throw std::invalid_argument("W-component of vector equals 0!");
+        }
+    }
+}
+
+void vector_push(std::string& str_num, Config& config, int i)
+{
+    if(config.type == "int")
+    {
+        auto* vec = dynamic_cast<Config::TypedVector<int>*>(config.vect.get());
+        if(vec)
+        {
+            size_t pos;
+            int val = std::stoi(str_num, &pos);
+            if (pos != str_num.length())
+            {
+                throw std::invalid_argument("Еxtra characters in number!\n");
+            }
+            vec->data.push_back(val);
+        }
+    }
+    else if(config.type == "float")
+    {
+        auto* vec = dynamic_cast<Config::TypedVector<float>*>(config.vect.get());
+        if(vec)
+        {
+            size_t pos;
+            float val = std::stof(str_num, &pos);
+            if (pos != str_num.length())
+            {
+                throw std::invalid_argument("Еxtra characters in number!\n");
+            }
+            vec->data.push_back(val);
+        }
+    }
+    else if(config.type == "double")
+    {
+        auto* vec = dynamic_cast<Config::TypedVector<double>*>(config.vect.get());
+        if(vec)
+        {
+            size_t pos;
+            double val = std::stod(str_num, &pos);
+            if (pos != str_num.length())
+            {
+                throw std::invalid_argument("Еxtra characters in number!\n");
+            }
+            vec->data.push_back(val);
+        }
+    }
+
+    if(i == 3)
+    {
+        check_W(config);
+    }
+}
+
 void input_vector(Config& config)
 {
     if(config.type == "")
@@ -175,30 +265,7 @@ void input_vector(Config& config)
         std::cin >> str_num;
         try
         {
-            if(config.type == "int")
-            {
-                auto* vec = dynamic_cast<Config::TypedVector<int>*>(config.vect.get());
-                if(vec)
-                {
-                    vec->data.push_back(std::stoi(str_num));
-                }
-            }
-            else if(config.type == "float")
-            {
-                auto* vec = dynamic_cast<Config::TypedVector<float>*>(config.vect.get());
-                if(vec)
-                {
-                    vec->data.push_back(std::stof(str_num));
-                }
-            }
-            else if(config.type == "double")
-            {
-                auto* vec = dynamic_cast<Config::TypedVector<double>*>(config.vect.get());
-                if(vec)
-                {
-                    vec->data.push_back(std::stod(str_num));
-                }
-            }
+            vector_push(str_num, config, i);
         }
         catch(const std::exception & ex)
         {
@@ -279,9 +346,8 @@ int show_menu(Config& config)
         std::cout << "Enter new command:\n" << std::endl;
 
         std::cin >> new_command;
+        parse_command(new_command);
         std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-        
-        std::transform(new_command.begin(), new_command.end(), new_command.begin(), ::tolower);
 
         if(new_command == "name")
         {
