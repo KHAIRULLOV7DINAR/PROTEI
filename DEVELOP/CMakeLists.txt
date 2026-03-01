@@ -15,6 +15,9 @@ set(SOURCE_LIST
     src/console_menu.cpp
     src/log.cpp)
 
+#cppcheck
+#include(cmake/cppcheck.cmake)
+
 add_executable(${PROJECT_NAME} ${SOURCE_LIST})
 
 if(BUILD_TESTS)

@@ -48,10 +48,11 @@ struct Config
     std::unique_ptr<VectorBase> vect;
 
     Config() 
+        : string_values(std::make_shared<std::unordered_map<std::string, std::string>>()),
+        default_values(std::make_shared<std::unordered_map<std::string, std::string>>()),
+        vector_types(std::make_shared<std::vector<std::string>>()),
+        port(5555), i(0)
     {
-        string_values = std::make_shared<std::unordered_map<std::string, std::string>>();
-        default_values = std::make_shared<std::unordered_map<std::string, std::string>>();
-        vector_types = std::make_shared<std::vector<std::string>>();
         
         *string_values = {
             {"-a", ""},
