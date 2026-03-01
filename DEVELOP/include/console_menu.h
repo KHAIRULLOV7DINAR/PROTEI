@@ -9,8 +9,11 @@ void parse_port(Config& config);
 void parse_i(Config& config);
 void parse_console_string(Config& config);
 
+void parse_command(std::string& command);
 void input_name(std::string& name);
 void input_type(Config& config);
+void check_W(Config& config);
+void vector_push(std::string& str_num, Config& config, int i);
 void input_vector(Config& config);
 void print_menu_values(Config& config);
 void print_console_values(Config& config);
