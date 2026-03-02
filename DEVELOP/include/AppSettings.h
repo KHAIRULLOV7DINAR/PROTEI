@@ -7,6 +7,12 @@
 
 class AppSettings
 {
+/*
+Инвариант класса:
+ip имеет формат ipv4 (4 октета в диапазоне 0-255);
+port находится в диапазоне 0-65535;
+название библиотеки непустое.
+*/
 public:
     AppSettings(int argc, char** argv);
     ~AppSettings() = default;

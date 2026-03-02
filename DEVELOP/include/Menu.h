@@ -27,6 +27,10 @@ private:
 //Menu
 class Menu
 {
+/*
+Инвариант класса:
+сохранение инвариантов классов AppSettings, DataPool
+*/
 public:
     Menu(DataPool& data_pool, AppSettings& app_settings);
     ~Menu() = default;

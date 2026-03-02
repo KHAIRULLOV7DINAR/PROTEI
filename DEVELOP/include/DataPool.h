@@ -35,6 +35,12 @@ private:
 //DataPool
 class DataPool
 {
+/*
+Инвариант класса:
+все хранимые вектора имеют размерность = 4;
+w-компонента векторов не равно 0;
+типы данных векторов соответствуют int/float/double.
+*/
 public:
     DataPool() : allowed_types_{
         "int", 
