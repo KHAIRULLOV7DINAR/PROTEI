@@ -1,38 +1,29 @@
-#include "../include/console_menu.h"
+#include "../include/AppSettings.h"
+#include "../include/DataPool.h"
+#include "../include/Menu.h"
 #include "../include/log.h"
+
+#include <iostream>
+#include <memory>
 
 int main(int argc, char** argv)
 {
-    Config config;
-
-    //address sanitizer check
-    //int arr[4];
-    //arr[5] = 12;
-
-    //Reading console string values
+    // Address sanitizer check (раскомментировать для теста)
+    // int arr[4];
+    // arr[5] = 12;
+    
     try
     {
-        read_console_string(argc, argv, config);
+        AppSettings app_settings(argc, argv);
+        DataPool data_pool;
+        Menu menu(data_pool, app_settings);
+        
+        menu.show_menu();
     }
-    catch(std::exception& ex)
+    catch (std::exception& ex)
     {
         console_log(ex);
-
-        return 1;
     }
-
-    //Parsing console string values
-    try
-    {
-        parse_console_string(config);
-    }
-    catch(std::exception& ex)
-    {
-        console_log(ex);
-
-        return 1;
-    }
-
-    //CLI-Menu
-    return show_menu(config);
+    
+    return 0;
 }

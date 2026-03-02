@@ -12,8 +12,10 @@ include_directories("./include")
 
 set(SOURCE_LIST
     src/main.cpp
-    src/console_menu.cpp
-    src/log.cpp)
+    src/log.cpp
+    src/AppSettings.cpp
+    src/DataPool.cpp
+    src/Menu.cpp)
 
 #cppcheck
 #include(cmake/cppcheck.cmake)
