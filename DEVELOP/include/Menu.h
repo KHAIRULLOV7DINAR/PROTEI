@@ -10,7 +10,7 @@
 #include "./DataPool.h"
 
 
-//Menu
+//MenuItem
 class MenuItem
 {
 public:
@@ -50,8 +50,9 @@ private:
     void input_name();
     void input_type();
     void input_vector();
-    void print_settings();
-    void print_vectors();
+    void print_settings() const;
+    void print_help() const;
+    void print_vectors() const;
     void exit();
     MenuItem* find_item(const std::string& command) const;
 };

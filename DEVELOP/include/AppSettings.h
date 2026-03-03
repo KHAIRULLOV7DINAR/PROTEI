@@ -11,7 +11,8 @@ class AppSettings
 Инвариант класса:
 ip имеет формат ipv4 (4 октета в диапазоне 0-255);
 port находится в диапазоне 0-65535;
-название библиотеки непустое.
+название библиотеки непустое;
+поле имени также непустое.
 */
 public:
     AppSettings(int argc, char** argv);
@@ -25,6 +26,7 @@ public:
     std::string get_library() const;
     std::string get_name() const;
 
+    //Сеттеры
     void set_name(std::string& name);
 
     void print_ip() const;
@@ -41,7 +43,7 @@ private:
     int i_ = 0;
     std::string library_;
 
-    //Имя программы 
+    //Имя программы (получаем из меню)
     std::string name_;
 
     void read_console_string(int argc, char** argv);

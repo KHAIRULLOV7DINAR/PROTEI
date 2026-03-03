@@ -12,7 +12,6 @@ class BaseVector
 public:
     virtual std::string get_type() const = 0;
     virtual void print() const = 0;
-    virtual bool check_w() const = 0;
 };
 
 template <typename T>
@@ -20,10 +19,9 @@ class TypedVector: public BaseVector
 {
 public:
     const int SIZE = 4;
-    explicit TypedVector(std::string type, std::vector<T> vect);
+    explicit TypedVector(std::string type, std::vector<T> vect) : type_(type), data_(vect){};
     std::string get_type() const override;
     void print() const override;
-    bool check_w() const override;
 
     const std::vector<T>& get_data() const;
 

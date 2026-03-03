@@ -60,6 +60,11 @@ void Menu::add_menu_items()
     {
         this->exit();
     }));
+
+    menu_items_.push_back(std::make_unique<MenuItem>("help", [this]()
+    {
+        this->print_help();
+    }));
 }
 
 void Menu::input_name()
@@ -86,7 +91,7 @@ void Menu::input_type()
     if(std::find(allowed_types.begin(), allowed_types.end(), new_type) == allowed_types.end())
     {
         //Invalid type (couldn't find input_type in allowed types list)
-        throw std::invalid_argument("\nInvalid type value!\n");
+        throw std::invalid_argument("Invalid type value!");
     }
     else
     {
@@ -145,7 +150,7 @@ void Menu::input_vector()
                 }
                 float_vec.push_back(num);
                 
-                if (i == 3 && num == 0.0f)
+                if (i == 3 && num == static_cast<float>(0.0))
                 {
                     float_vec.pop_back();
                     throw std::invalid_argument("W-component of vector cannot be zero!");
@@ -160,7 +165,7 @@ void Menu::input_vector()
                 }
                 double_vec.push_back(num);
                 
-                if (i == 3 && num == 0.0)
+                if (i == 3 && num == static_cast<double>(0.0))
                 {
                     double_vec.pop_back();
                     throw std::invalid_argument("W-component of vector cannot be zero!");
@@ -201,7 +206,7 @@ void Menu::input_vector()
     }
 }
 
-void Menu::print_settings()
+void Menu::print_settings() const
 {
     std::cout << "\nApp settings: \n";
     std::cout << "Name - " << app_settings_.get_name() <<std::endl;
@@ -211,6 +216,14 @@ void Menu::print_settings()
     std::cout << "Role - " << app_settings_.get_role() << std::endl;
     std::cout << "i - " << app_settings_.get_i() << std::endl;
     std::cout << "Library - " << app_settings_.get_library() << std::endl;
+}
+
+void Menu::print_help() const
+{
+    std::string str_help = "\nName - name for the program;\nType - type of the vector;\nVector - 4-d int vector;\nSettings - show app settings arguments\nHelp - show available command\nExit - exit the program\n";
+
+    std::cout << str_help << std::endl;
+    std::cout << "Warning! No multiple values are allowed in one string except for 4-d vector values! (cin.ignore used).\n" << std::endl;
 }
 
 void Menu::exit()
@@ -236,8 +249,9 @@ void Menu::show_menu()
 {
     std::string new_command;
 
-    std::cout << "\nEnter one of the following commands:\nName - name for the program;\nType - type of the vector;\nVector - 4-d int vector;\nExit - exit from the menu;\nSettings - show app settings arguments\n" << std::endl;
-    std::cout << "Warning! No multiple values are allowed in one string except for 4-d vector values! (cin.ignore used).\n" << std::endl;
+    std::cout << "Enter one of the following commands:";
+
+    print_help();
 
     while(menu_flag_)
     {

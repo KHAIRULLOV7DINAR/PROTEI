@@ -59,6 +59,11 @@ std::string AppSettings::get_name() const
 
 void AppSettings::set_name(std::string& name)
 {
+    //Нельзя установить пустое имя
+    if(name.empty())
+    {
+        throw std::logic_error("Setting empty name is not allowed!");
+    }
     name_ = name;
 }
 
@@ -66,7 +71,10 @@ void AppSettings::print_ip() const
 {
     for (int i = 0; i < ip_.size(); ++i)
     {
-        if (i > 0) std::cout << ".";
+        if (i > 0)
+        {
+            std::cout << ".";
+        }
         std::cout << static_cast<int>(ip_[i]);
     }
     std::cout << std::endl;

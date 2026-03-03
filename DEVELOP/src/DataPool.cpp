@@ -6,13 +6,6 @@
 
 //Вектор
 template <typename T>
-TypedVector<T>::TypedVector(std::string type, std::vector<T> vect)
-{
-    type_ = type;
-    data_ = vect;
-}
-
-template <typename T>
 std::string TypedVector<T>::get_type() const
 {
     return type_;
@@ -21,18 +14,15 @@ std::string TypedVector<T>::get_type() const
 template <typename T>
 void TypedVector<T>::print() const
 {
-    int size = data_.size();
-    for (int i = 0; i < size - 1; i++)
+    for (int i = 0; i < SIZE - 1; i++)
     {
-        std::cout << data_[i] << "; ";
+        if(i > 0)
+        {
+            std::cout << "; ";
+        }
+        std::cout << data_[i];
     }
-    std::cout << data_[size - 1];
-}
-
-template <typename T>
-bool TypedVector<T>::check_w() const
-{
-    return data_[data_.size() - 1] == T(0);
+    std::cout << std::endl;
 }
 
 template <typename T>
@@ -52,6 +42,7 @@ void DataPool::insert(std::unique_ptr<BaseVector> vec)
     {
         throw std::invalid_argument("Cannot insert null vector!");
     }
+
     pool_.push_back(std::move(vec));
 }
 
