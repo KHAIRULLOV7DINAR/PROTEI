@@ -10,7 +10,8 @@
 class BaseVector
 {
 public:
-    virtual std::string get_type() const = 0;
+    virtual const std::string get_type() const = 0;
+
     virtual void print() const = 0;
 };
 
@@ -20,10 +21,11 @@ class TypedVector: public BaseVector
 public:
     const int SIZE = 4;
     explicit TypedVector(std::string type, std::vector<T> vect) : type_(type), data_(vect){};
-    std::string get_type() const override;
-    void print() const override;
 
+    const std::string get_type() const override;
     const std::vector<T>& get_data() const;
+
+    void print() const override;
 
 private:
     std::string type_;
@@ -45,9 +47,13 @@ public:
         "float",
         "double"
     }{};
+    
+    const std::vector<std::string>& get_allowed_types();
+
     void insert(std::unique_ptr<BaseVector> vec);
     std::unique_ptr<BaseVector> first(); 
-    const std::vector<std::string>& get_allowed_types();
+
+    void print_vectors() const;
 
 private:
     std::deque<std::unique_ptr<BaseVector>> pool_;

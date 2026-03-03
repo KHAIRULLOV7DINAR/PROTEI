@@ -61,9 +61,16 @@ void Menu::add_menu_items()
         this->exit();
     }));
 
+    // Команда help - вывод справки по командам
     menu_items_.push_back(std::make_unique<MenuItem>("help", [this]()
     {
         this->print_help();
+    }));
+
+    // Команда vectors - вывод записанных векторов
+    menu_items_.push_back(std::make_unique<MenuItem>("vectors", [this]()
+    {
+        this->print_vectors();
     }));
 }
 
@@ -220,10 +227,15 @@ void Menu::print_settings() const
 
 void Menu::print_help() const
 {
-    std::string str_help = "\nName - name for the program;\nType - type of the vector;\nVector - 4-d int vector;\nSettings - show app settings arguments\nHelp - show available command\nExit - exit the program\n";
+    std::string str_help = "\nName - enter name for the program;\nType - enter type of the vector;\nVector - enter 4-d int vector;\nVectors - show entered vectors\nSettings - show app settings arguments\nHelp - show available command\nExit - exit the program\n";
 
     std::cout << str_help << std::endl;
     std::cout << "Warning! No multiple values are allowed in one string except for 4-d vector values! (cin.ignore used).\n" << std::endl;
+}
+
+void Menu::print_vectors() const
+{
+    data_pool_.print_vectors();
 }
 
 void Menu::exit()
@@ -249,7 +261,7 @@ void Menu::show_menu()
 {
     std::string new_command;
 
-    std::cout << "Enter one of the following commands:";
+    std::cout << "\nEnter one of the following commands:";
 
     print_help();
 
