@@ -55,7 +55,7 @@ TEST_F(MenuTestFixture, EnterCommandTest)
 {
     std::string new_command = "e x \nit";
 
-    menu->parse_command(new_command);
+    menu->parse_input(new_command);
 
     EXPECT_EQ("exit", new_command);
 }

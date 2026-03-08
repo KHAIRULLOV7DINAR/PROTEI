@@ -35,7 +35,7 @@ public:
     Menu(DataPool& data_pool, AppSettings& app_settings);
     ~Menu() = default;
     
-    static void parse_command(std::string& command);
+    static void parse_input(std::string& command);
     void show_menu();
 
     std::string current_type;

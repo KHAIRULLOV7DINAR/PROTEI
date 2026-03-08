@@ -101,7 +101,7 @@ void Menu::input_type()
 
     std::cout << "\nEnter type for vector:\n" << std::endl;
     std::cin >> new_type;
-    std::transform(new_type.begin(), new_type.end(), new_type.begin(), ::tolower);
+    parse_input(new_type);
 
     if(std::find(allowed_types.begin(), allowed_types.end(), new_type) == allowed_types.end())
     {
@@ -244,7 +244,7 @@ void Menu::quit()
     exit();
 }
 
-void Menu::parse_command(std::string& command)
+void Menu::parse_input(std::string& command)
 {
     std::string result;
     for (char c : command)
@@ -269,7 +269,7 @@ void Menu::show_menu()
     {
         std::cout << "Enter new command:\n" << std::endl;
         std::cin >> new_command;
-        parse_command(new_command);
+        parse_input(new_command);
         std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');  
 
         MenuItem* item = find_item(new_command);
