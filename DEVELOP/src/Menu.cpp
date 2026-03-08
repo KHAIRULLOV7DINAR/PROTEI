@@ -202,9 +202,9 @@ void Menu::print_settings() const
 {
     std::cout << "\nApp settings: \n";
     std::cout << "Name - " << app_settings_.get_name() <<std::endl;
-    std::cout << "Ip-address - ";
-    app_settings_.print_ip();
-    std::cout << "Port - " << (unsigned short int)app_settings_.get_port() << std::endl;
+    std::cout << "Network-address - ";
+    app_settings_.print_address();
+    // std::cout << "Port - " << (unsigned short int)app_settings_.get_port() << std::endl;
     std::cout << "Role - " << app_settings_.get_role() << std::endl;
     std::cout << "i - " << app_settings_.get_i() << std::endl;
     std::cout << "Library - " << app_settings_.get_library() << std::endl;
@@ -212,7 +212,7 @@ void Menu::print_settings() const
 
 void Menu::print_help() const
 {
-    std::string str_help = "\nName - enter name for the program;\nType - enter type of the vector;\nVector - enter 4-d int vector;\nVectors - show entered vectors\nSettings - show app settings arguments\nHelp - show available command\nExit - exit the program\n";
+    std::string str_help = "\nName - enter name for the program;\nType - enter type of the vector;\nVector - enter 4-d int vector;\nVectors - show entered vectors\nSettings - show app settings arguments\nHelp - show available commands\nExit - exit the program\n";
 
     std::cout << str_help << std::endl;
     std::cout << "Warning! No multiple values are allowed in one string except for 4-d vector values! (cin.ignore used).\n" << std::endl;
