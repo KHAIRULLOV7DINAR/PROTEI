@@ -4,7 +4,9 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 add_executable(run_tests
     test_menu.cpp
-    ../src/console_menu.cpp
+    ../src/AppSettings.cpp
+    ../src/DataPool.cpp
+    ../src/Menu.cpp
     ../src/log.cpp)
 
 target_link_libraries(run_tests
