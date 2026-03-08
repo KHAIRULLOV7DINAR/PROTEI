@@ -1,88 +1,83 @@
 #include <gtest/gtest.h>
+#include <sstream>
+#include <memory>
 
-#include "../include/console_menu.h"
+#include "../include/Menu.h"
+#include "../include/AppSettings.h"
+#include "../include/DataPool.h"
 #include "../include/log.h"
-#include "../include/config.hpp"
 
-//Ввод непечатных символов
-TEST(MenuTest, CommandInput)
+
+class MenuWrapper : public Menu
 {
-    std::string new_command;
+public:
+    using Menu::Menu;
 
-    new_command = "eX It\n";
-    parse_command(new_command);
-    EXPECT_EQ(new_command, "exit");
+    using Menu::input_type;
+    using Menu::input_vector;
+};
 
-    new_command = "M3NU!\t";
-    parse_command(new_command);
-    EXPECT_EQ(new_command, "m3nu");
-
-    new_command = " \n\t!@#$%^";
-    parse_command(new_command);
-    EXPECT_EQ(new_command, "");
-}
-
-//Ввод вектора
-//Проверка используемой функции, которая добавляет лишь одно значение вектора, преобразованного из str к int/float/double
-TEST(MenuTest, VectorInputTest)
+class MenuTestFixture : public ::testing::Test
 {
-    Config config;
-    std::string str_num;
-
-    //int
-    config.type = "int";
-    config.createTypedVector(config.type);
-
-    str_num = "qwerty";
-    EXPECT_THROW(vector_push(str_num, config, 0), std::invalid_argument);
-    config.vect->clear();
-
-    str_num = "12a4";
-    EXPECT_THROW(vector_push(str_num, config, 0), std::invalid_argument);
-    config.vect->clear();
-
-    str_num = "-123";
-    EXPECT_NO_THROW(vector_push(str_num, config, 0));
-    config.vect->clear();
-
-    //float
-    config.type = "float";
-    config.createTypedVector(config.type);
-
-    str_num = "qwerty";
-    EXPECT_THROW(vector_push(str_num, config, 0), std::invalid_argument);
-    config.vect->clear();
-
-    str_num = "132.as44";
-    EXPECT_THROW(vector_push(str_num, config, 0), std::invalid_argument);
-    config.vect->clear();
-
-    str_num = "-25.3454";
-    EXPECT_NO_THROW(vector_push(str_num, config, 0));
-    config.vect->clear();
-}
-
-//W аргумент вектора
-TEST(MenuTest, VectorWArgument)
-{
-    Config config;
-    std::string str_num;
-
-    //float
-    config.type = "float";
-    config.createTypedVector(config.type);
-
-    std::vector<std::string> nums = {
-        "1.3",
-        "2.23",
-        "3.4",
-        "0.0"
-    };
-    for(int i = 0; i < 3; i ++)
+protected:
+    void SetUp() override
     {
-        EXPECT_NO_THROW(vector_push(nums[i], config, i));
+        char* argv[] = {const_cast<char*>("program"), const_cast<char*>("-a"), const_cast<char*>("127.127.127.127"), const_cast<char*>("-L"), const_cast<char*>("myLib")};
+        app_settings = std::make_unique<AppSettings>(5, argv);
+        data_pool = std::make_unique<DataPool>();
+        menu = std::make_unique<MenuWrapper>(*data_pool, *app_settings);
     }
 
-    EXPECT_THROW(vector_push(nums[3], config, 3), std::invalid_argument);
+    void TearDown() override{}
 
+    void set_cin_input(const std::string& input)
+    {
+        cin_buffer = std::cin.rdbuf();
+        std::cin.rdbuf(input_stream.rdbuf());
+        input_stream.str(input);
+    }
+
+    void restore_cin()
+    {
+        std::cin.rdbuf(cin_buffer);
+    }
+
+    std::unique_ptr<AppSettings> app_settings;
+    std::unique_ptr<DataPool> data_pool;
+    std::unique_ptr<MenuWrapper> menu;
+    
+    std::stringstream input_stream;
+    std::streambuf* cin_buffer = nullptr;
+};
+
+
+TEST_F(MenuTestFixture, EnterCommandTest)
+{
+    std::string new_command = "e x \nit";
+
+    menu->parse_command(new_command);
+
+    EXPECT_EQ("exit", new_command);
+}
+
+TEST_F(MenuTestFixture, InputVectorValueTest)
+{
+    set_cin_input("int\n");
+    EXPECT_NO_THROW(menu->input_type());
+    restore_cin(); 
+
+    set_cin_input("1 2 sdsdaf 4\n");
+    EXPECT_THROW(menu->input_vector(), std::invalid_argument);
+    restore_cin();
+}
+
+TEST_F(MenuTestFixture, InputVectorWTest)
+{
+    set_cin_input("float\n");
+    EXPECT_NO_THROW(menu->input_type());
+    restore_cin();
+
+    set_cin_input("1.1 2.2 3.3 0.0\n");
+    EXPECT_THROW(menu->input_vector(), std::invalid_argument);
+    restore_cin();
 }
