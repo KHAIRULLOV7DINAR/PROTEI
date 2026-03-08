@@ -4,6 +4,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 add_executable(run_tests
     test_menu.cpp
+    ../src/NetworkAddress.cpp
     ../src/AppSettings.cpp
     ../src/DataPool.cpp
     ../src/Menu.cpp

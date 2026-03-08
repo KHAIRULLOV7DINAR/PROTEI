@@ -29,12 +29,12 @@ AppSettings::AppSettings(int argc, char** argv) :
 
 const std::vector<unsigned char>& AppSettings::get_ip() const
 {
-    return ip_;
+    return network_address_.get_ip();
 }
 
 unsigned short AppSettings::get_port() const
 {
-    return port_;
+    return network_address_.get_port();
 }
 
 std::string AppSettings::get_role() const
@@ -67,17 +67,9 @@ void AppSettings::set_name(std::string& name)
     name_ = name;
 }
 
-void AppSettings::print_ip() const
+void AppSettings::print_address() const
 {
-    for (int i = 0; i < ip_.size(); ++i)
-    {
-        if (i > 0)
-        {
-            std::cout << ".";
-        }
-        std::cout << static_cast<int>(ip_[i]);
-    }
-    std::cout << std::endl;
+    network_address_.print_address();
 }
 
 void AppSettings::read_console_string(int argc, char** argv)
@@ -122,33 +114,7 @@ void AppSettings::read_console_string(int argc, char** argv)
 
 void AppSettings::parse_ip_string()
 {
-    std::stringstream ss_ip(string_values_["-a"]);
-    std::string oct;
-
-    while(std::getline(ss_ip, oct, '.'))
-    {
-        //exception could be thrown in stoi func. In that case it's gonna be caught in main func.
-        size_t pos;
-        int int_oct = std::stoi(oct, &pos);
-        if (pos != oct.length())
-        {
-            throw std::invalid_argument("Invalid symbols in ip-oct value!");
-        }
-
-        if(0 <= int_oct && int_oct <= 255)
-        {
-            ip_.push_back((unsigned char)int_oct);
-        }
-        else
-        {
-            throw std::invalid_argument("Invalid ip-address octet value!");
-        }
-    }
-
-    if(ip_.size() != 4)
-    {
-        throw std::invalid_argument("Invalid ip-address format!");
-    }
+    network_address_.set_ip(string_values_["-a"]);
 }
 
 void AppSettings::parse_port()
@@ -163,7 +129,7 @@ void AppSettings::parse_port()
     
     if(0 <= int_port && int_port <= 65535)
     {
-        port_ = (unsigned short)int_port;
+        network_address_.set_port(static_cast<unsigned short>(int_port));
     }
     else
     {

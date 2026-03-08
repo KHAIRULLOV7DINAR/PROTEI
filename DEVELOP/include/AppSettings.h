@@ -1,6 +1,8 @@
 #ifndef APPSETTINGS_H
 #define APPSETTINGS_H
 
+#include "NetworkAddress.h"
+
 #include <string>
 #include <vector>
 #include <unordered_map>
@@ -29,7 +31,7 @@ public:
     //Сеттеры
     void set_name(std::string& name);
 
-    void print_ip() const;
+    void print_address() const;
 
 private:
     // Мапы для хранения получаемых и дефолтных значений консольной строки
@@ -37,8 +39,7 @@ private:
     std::unordered_map<std::string, std::string> default_values_;
 
     // Аргументы командной строки
-    std::vector<unsigned char> ip_;
-    unsigned short port_ = 0;
+    NetworkAddress network_address_;
     std::string role_;
     int i_ = 0;
     std::string library_;
