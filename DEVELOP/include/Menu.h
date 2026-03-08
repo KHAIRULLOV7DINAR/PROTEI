@@ -53,6 +53,7 @@ protected:
     void print_settings() const;
     void print_help() const;
     void print_vectors() const;
+    void quit();
     void exit();
     MenuItem* find_item(const std::string& command) const;
 };

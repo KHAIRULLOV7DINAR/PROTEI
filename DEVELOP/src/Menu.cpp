@@ -5,6 +5,8 @@
 #include <limits>
 #include <algorithm>
 #include <sstream>
+#include <cstdlib>
+
 
 //MenuItem
 MenuItem::MenuItem(const std::string& command_name, std::function<void()> f_action)
@@ -59,6 +61,12 @@ void Menu::add_menu_items()
     menu_items_.push_back(std::make_unique<MenuItem>("exit", [this]()
     {
         this->exit();
+    }));
+
+    // Команда quit - выход из программы
+    menu_items_.push_back(std::make_unique<MenuItem>("exit", [this]()
+    {
+        this->quit();
     }));
 
     // Команда help - вывод справки по командам
@@ -227,6 +235,13 @@ void Menu::exit()
 {
     std::cout << "\nExit from the menu\n" << std::endl;
     menu_flag_ = false;
+}
+
+//Чем конкретно должно отличаться от exit????????
+void Menu::quit()
+{
+    std::cout << "\nQuit from the menu\n" << std::endl;
+    exit();
 }
 
 void Menu::parse_command(std::string& command)
