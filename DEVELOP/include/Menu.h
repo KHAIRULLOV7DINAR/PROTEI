@@ -40,7 +40,7 @@ public:
 
     std::string current_type;
 
-private:
+protected:
     DataPool& data_pool_;
     AppSettings& app_settings_;
     bool menu_flag_;

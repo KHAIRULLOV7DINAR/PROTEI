@@ -4,7 +4,7 @@
 #include <iostream>
 #include <limits>
 #include <algorithm>
-
+#include <sstream>
 
 //MenuItem
 MenuItem::MenuItem(const std::string& command_name, std::function<void()> f_action)
@@ -113,104 +113,89 @@ void Menu::input_vector()
 {
     if (current_type.empty())
     {
-        std::cout << "\nType is not entered!\n" << std::endl;
-        return;
+        throw std::logic_error("Type is not entered!");
     }
 
-    std::cout << "\nEnter 4 " << current_type << " values:\n" << std::endl;
+    std::cout << "\nEnter 4 " << current_type << " values separated by spaces:\n" << std::endl;
     
+    std::string line;
+    std::getline(std::cin, line);
+    std::stringstream ss(line);
+    std::vector<std::string> str_nums;
     std::string str_num;
-    std::vector<int> int_vec;
-    std::vector<float> float_vec;
-    std::vector<double> double_vec;
-    
-    for(int i = 0; i < 4; i++)
+    while (ss >> str_num)
     {
-        std::cout << "Enter value " << i + 1 << ": ";
-        std::cin >> str_num;
-        
-        try
+        str_nums.push_back(str_num);
+    }
+
+    if (str_nums.size() != 4)
+    {
+        throw std::invalid_argument("Invalid amount of vector values was given!");
+    }
+
+    if (current_type == "int")
+    {
+        std::vector<int> vec;
+        for (const auto& t : str_nums)
         {
             size_t pos;
-            
-            if (current_type == "int")
+            int num = std::stoi(t, &pos);
+            if (pos != t.length())
             {
-                int num = std::stoi(str_num, &pos);
-                if (pos != str_num.length())
-                {
-                    throw std::invalid_argument("Invalid integer format!");
-                }
-                int_vec.push_back(num);
-                
-                if (i == 3 && num == 0)
-                {
-                    int_vec.pop_back(); 
-                    throw std::invalid_argument("W-component of vector cannot be zero!");
-                }
+                throw std::invalid_argument("Invalid integer format!");
             }
-            else if (current_type == "float")
-            {
-                float num = std::stof(str_num, &pos);
-                if (pos != str_num.length())
-                {
-                    throw std::invalid_argument("Invalid float format!");
-                }
-                float_vec.push_back(num);
-                
-                if (i == 3 && num == static_cast<float>(0.0))
-                {
-                    float_vec.pop_back();
-                    throw std::invalid_argument("W-component of vector cannot be zero!");
-                }
-            }
-            else if (current_type == "double")
-            {
-                double num = std::stod(str_num, &pos);
-                if (pos != str_num.length())
-                {
-                    throw std::invalid_argument("Invalid double format!");
-                }
-                double_vec.push_back(num);
-                
-                if (i == 3 && num == static_cast<double>(0.0))
-                {
-                    double_vec.pop_back();
-                    throw std::invalid_argument("W-component of vector cannot be zero!");
-                }
-            }
+            vec.push_back(num);
         }
-        catch(std::exception& ex)
+        if (vec[3] == 0)
         {
-            i--; 
-            std::cin.clear(); 
-            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-            console_log(ex);
-            continue;
+            throw std::invalid_argument("W-component of vector cannot be zero!");
         }
+        data_pool_.insert(std::make_unique<TypedVector<int>>(current_type, vec));
     }
-    
-    try
+    else if (current_type == "float")
     {
-        if (current_type == "int" && int_vec.size() == 4)
+        std::vector<float> vec;
+        for (const auto& t : str_nums)
         {
-            data_pool_.insert(std::make_unique<TypedVector<int>>(current_type, int_vec));
+            size_t pos;
+            float num = std::stof(t, &pos);
+            if (pos != t.length())
+            {
+                throw std::invalid_argument("Invalid float format!");
+            }
+            vec.push_back(num);
         }
-        else if (current_type == "float" && float_vec.size() == 4)
+        if (vec[3] == 0.0f)
         {
-            data_pool_.insert(std::make_unique<TypedVector<float>>(current_type, float_vec));
+            throw std::invalid_argument("W-component of vector cannot be zero!");
         }
-        else if (current_type == "double" && double_vec.size() == 4)
-        {
-            data_pool_.insert(std::make_unique<TypedVector<double>>(current_type, double_vec));
-        }
-        
-        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-        std::cout << "\nVector added successfully!\n " << std::endl;
+        data_pool_.insert(std::make_unique<TypedVector<float>>(current_type, vec));
     }
-    catch(std::exception& ex)
+    else if (current_type == "double")
     {
-        console_log(ex);
+        std::vector<double> vec;
+        for (const auto& t : str_nums)
+        {
+            size_t pos;
+            double num = std::stod(t, &pos);
+            if (pos != t.length())
+            {
+                throw std::invalid_argument("Invalid double format!");
+            }
+            vec.push_back(num);
+        }
+        if (vec[3] == 0.0)
+        {
+            throw std::invalid_argument("W-component of vector cannot be zero!");
+        }
+        data_pool_.insert(std::make_unique<TypedVector<double>>(current_type, vec));
     }
+    else
+    {
+        throw std::logic_error("Invalid type!");
+    }
+
+    std::cout << "\nVector added successfully!\n" << std::endl;
 }
 
 void Menu::print_settings() const
