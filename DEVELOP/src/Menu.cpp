@@ -220,7 +220,7 @@ void Menu::print_settings() const
 
 void Menu::print_help() const
 {
-    std::string str_help = "\nName - enter name for the program;\nType - enter type of the vector;\nVector - enter 4-d int vector;\nVectors - show entered vectors\nSettings - show app settings arguments\nHelp - show available commands\nExit - exit the program\n";
+    std::string str_help = "\nName -\t\tenter name for the program;\nType -\t\tenter type of the vector;\nVector -\tenter 4-d int vector;\nVectors -\tshow entered vectors\nSettings -\tshow app settings arguments\nHelp -\t\tshow available commands\nExit -\t\texit the program\n";
 
     std::cout << str_help << std::endl;
     std::cout << "Warning! No multiple values are allowed in one string except for 4-d vector values! (cin.ignore used).\n" << std::endl;
