@@ -34,52 +34,52 @@ Menu::Menu(DataPool& data_pool, AppSettings& app_settings) : menu_flag_(true), a
 void Menu::add_menu_items()
 {
     // Команда name - ввод имени программы
-    menu_items_.push_back(std::make_unique<MenuItem>("name", [this]()
+    menu_items_["name"] = std::make_unique<MenuItem>("name", [this]()
     {
         this->input_name();
-    }));
+    });
     
     // Команда type - выбор типа вектора
-    menu_items_.push_back(std::make_unique<MenuItem>("type", [this]()
+    menu_items_["type"] = std::make_unique<MenuItem>("type", [this]()
     {
         this->input_type();
-    }));
+    });
     
     // Команда vector - ввод вектора
-    menu_items_.push_back(std::make_unique<MenuItem>("vector", [this]()
+    menu_items_["vector"] = std::make_unique<MenuItem>("vector", [this]()
     {
         this->input_vector();
-    }));
+    });
     
     // Команда console - показать настройки из командной строки
-    menu_items_.push_back(std::make_unique<MenuItem>("settings", [this]()
+    menu_items_["settings"] = std::make_unique<MenuItem>("settings", [this]()
     {
         this->print_settings();
-    }));
+    });
     
     // Команда exit - выход из программы
-    menu_items_.push_back(std::make_unique<MenuItem>("exit", [this]()
+    menu_items_["exit"] = std::make_unique<MenuItem>("exit", [this]()
     {
         this->exit();
-    }));
+    });
 
     // Команда quit - выход из программы
-    menu_items_.push_back(std::make_unique<MenuItem>("exit", [this]()
+    menu_items_["quit"] = std::make_unique<MenuItem>("quit", [this]()
     {
         this->quit();
-    }));
+    });
 
     // Команда help - вывод справки по командам
-    menu_items_.push_back(std::make_unique<MenuItem>("help", [this]()
+    menu_items_["help"] = std::make_unique<MenuItem>("help", [this]()
     {
         this->print_help();
-    }));
+    });
 
     // Команда vectors - вывод записанных векторов
-    menu_items_.push_back(std::make_unique<MenuItem>("vectors", [this]()
+    menu_items_["vectors"] = std::make_unique<MenuItem>("vectors", [this]()
     {
         this->print_vectors();
-    }));
+    });
 }
 
 void Menu::input_name()
@@ -208,22 +208,26 @@ void Menu::input_vector()
 
 void Menu::print_settings() const
 {
-    std::cout << "\nApp settings: \n";
-    std::cout << "Name - " << app_settings_.get_name() <<std::endl;
-    std::cout << "Network-address - ";
+    std::cout << "\nApp settings: \n"
+              << "Name -\t\t" << app_settings_.get_name() <<std::endl
+              << "Address -\t";
     app_settings_.print_address();
-    // std::cout << "Port - " << (unsigned short int)app_settings_.get_port() << std::endl;
-    std::cout << "Role - " << app_settings_.get_role() << std::endl;
-    std::cout << "i - " << app_settings_.get_i() << std::endl;
-    std::cout << "Library - " << app_settings_.get_library() << std::endl;
+    std::cout << "Role -\t\t" << app_settings_.get_role() << std::endl
+              << "i -\t\t" << app_settings_.get_i() << std::endl
+              << "Library -\t" << app_settings_.get_library() << std::endl;
 }
 
 void Menu::print_help() const
 {
-    std::string str_help = "\nName -\t\tenter name for the program;\nType -\t\tenter type of the vector;\nVector -\tenter 4-d int vector;\nVectors -\tshow entered vectors\nSettings -\tshow app settings arguments\nHelp -\t\tshow available commands\nExit -\t\texit the program\n";
-
-    std::cout << str_help << std::endl;
-    std::cout << "Warning! No multiple values are allowed in one string except for 4-d vector values! (cin.ignore used).\n" << std::endl;
+    std::cout << "\nName -\t\tenter name for the program;\n"
+              << "Type -\t\tenter type of the vector;\n"
+              << "Vector -\tenter 4-d int vector;\n"
+              << "Vectors -\tshow entered vectors\n"
+              << "Settings -\tshow app settings arguments\n"
+              << "Help -\t\tshow available commands\n"
+              << "Exit -\t\texit the program\n"
+              << "\nWarning! No multiple values are allowed in one string except for 4-d vector values! (cin.ignore used).\n"
+              << std::endl;
 }
 
 void Menu::print_vectors() const
@@ -267,7 +271,7 @@ void Menu::show_menu()
 
     while(menu_flag_)
     {
-        std::cout << "Enter new command:\n" << std::endl;
+        std::cout << "\nEnter new command:\n" << std::endl;
         std::cin >> new_command;
         parse_input(new_command);
         std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');  
@@ -291,14 +295,12 @@ void Menu::show_menu()
     }
 }
 
-MenuItem* Menu::find_item(const std::string& command) const
+MenuItem* Menu::find_item(const std::string& command)
 {
-    for (const auto& item : menu_items_)
+    auto pair = menu_items_.find(command);
+    if (pair != menu_items_.end())
     {
-        if (item->get_command_name() == command)
-        {
-            return item.get();
-        }
+        return pair->second.get();
     }
     return nullptr;
 }

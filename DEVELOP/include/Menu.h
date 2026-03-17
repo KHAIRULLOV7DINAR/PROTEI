@@ -5,6 +5,7 @@
 #include <string>
 #include <vector>
 #include <functional>
+#include <unordered_map>
 
 #include "./AppSettings.h"
 #include "./DataPool.h"
@@ -44,7 +45,7 @@ protected:
     DataPool& data_pool_;
     AppSettings& app_settings_;
     bool menu_flag_;
-    std::vector<std::unique_ptr<MenuItem>> menu_items_;
+    std::unordered_map<std::string, std::unique_ptr<MenuItem>> menu_items_;
 
     void add_menu_items();
     void input_name();
@@ -55,7 +56,7 @@ protected:
     void print_vectors() const;
     void quit();
     void exit();
-    MenuItem* find_item(const std::string& command) const;
+    MenuItem* find_item(const std::string& command);
 };
 
 #endif

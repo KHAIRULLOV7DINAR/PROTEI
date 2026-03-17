@@ -20,7 +20,7 @@ const std::vector<T>& TypedVector<T>::get_data() const
 template <typename T>
 void TypedVector<T>::print() const
 {
-    if(data_.size() == 0)
+    if(data_.empty())
     {
         throw std::logic_error("No values in vector!");
     }
@@ -71,7 +71,7 @@ std::unique_ptr<BaseVector> DataPool::first()
 
 void DataPool::print_vectors() const
 {
-    if(pool_.size() == 0)
+    if(pool_.empty())
     {
         std::cout << "\nNo vectors in data pool!\n\n";
 
