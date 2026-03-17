@@ -1,11 +1,12 @@
 #ifndef APPSETTINGS_H
 #define APPSETTINGS_H
 
-#include "NetworkAddress.h"
-
 #include <string>
 #include <vector>
 #include <unordered_map>
+
+#include "NetworkAddress.h"
+
 
 class AppSettings
 {

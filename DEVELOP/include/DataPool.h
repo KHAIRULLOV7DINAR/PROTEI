@@ -6,6 +6,7 @@
 #include <deque>
 #include <memory>
 
+
 //Классы для хранения векторов
 class BaseVector
 {

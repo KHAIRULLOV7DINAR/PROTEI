@@ -1,9 +1,11 @@
-#include "../include/Tests.h"
 #include <iostream>
 #include <sstream>
 #include <cctype>
 #include <sys/stat.h>
 #include <stdexcept>
+
+#include "../include/Tests.h"
+
 
 void ConnectionTest::set_params(const std::vector<std::string>& params)
 {

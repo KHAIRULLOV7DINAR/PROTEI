@@ -8,7 +8,7 @@ add_executable(run_tests
     ../src/AppSettings.cpp
     ../src/DataPool.cpp
     ../src/Menu.cpp
-    ../src/log.cpp)
+    ../src/Logger.cpp)
 
 target_link_libraries(run_tests
     gtest

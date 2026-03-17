@@ -1,11 +1,11 @@
-#include "../include/Menu.h"
-#include "../include/log.h"
-
 #include <iostream>
 #include <limits>
 #include <algorithm>
 #include <sstream>
 #include <cstdlib>
+
+#include "../include/Menu.h"
+#include "../include/Logger.h"
 
 
 //MenuItem
@@ -26,7 +26,7 @@ void MenuItem::execute() const
 }
 
 //Menu
-Menu::Menu(DataPool& data_pool, AppSettings& app_settings) : menu_flag_(true), app_settings_(app_settings), data_pool_(data_pool)
+Menu::Menu(Logger& file_logger, DataPool& data_pool, AppSettings& app_settings) :logger_(file_logger), menu_flag_(true), app_settings_(app_settings), data_pool_(data_pool)
 {
     add_menu_items();
 };
@@ -290,7 +290,8 @@ void Menu::show_menu()
         }
         catch(std::exception& ex)
         {
-            console_log(ex);
+            logger_.simple_console_log(ex);
+            logger_.file_log(ex);
         }
     }
 }

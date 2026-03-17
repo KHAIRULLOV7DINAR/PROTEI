@@ -3,7 +3,6 @@
 #include <string>
 #include <sstream>
 
-#include "../include/log.h"
 #include "../include/AppSettings.h"
 
 

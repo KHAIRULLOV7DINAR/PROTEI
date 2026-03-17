@@ -5,7 +5,7 @@
 #include "../include/Menu.h"
 #include "../include/AppSettings.h"
 #include "../include/DataPool.h"
-#include "../include/log.h"
+#include "../include/Logger.h"
 
 
 //Обертка для доступа к приват методам меню
@@ -25,9 +25,10 @@ protected:
     void SetUp() override
     {
         char* argv[] = {const_cast<char*>("program"), const_cast<char*>("-a"), const_cast<char*>("127.127.127.127"), const_cast<char*>("-L"), const_cast<char*>("myLib")};
+        logger = std::make_unique<Logger>("../logs/log.txt");
         app_settings = std::make_unique<AppSettings>(5, argv);
         data_pool = std::make_unique<DataPool>();
-        menu = std::make_unique<MenuWrapper>(*data_pool, *app_settings);
+        menu = std::make_unique<MenuWrapper>(*logger, *data_pool, *app_settings);
     }
 
     void TearDown() override{}
@@ -43,7 +44,7 @@ protected:
     {
         std::cin.rdbuf(cin_buffer);
     }
-
+    std::unique_ptr<Logger> logger;
     std::unique_ptr<AppSettings> app_settings;
     std::unique_ptr<DataPool> data_pool;
     std::unique_ptr<MenuWrapper> menu;

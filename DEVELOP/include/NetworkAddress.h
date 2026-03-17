@@ -4,6 +4,7 @@
 #include <string>
 #include <vector>
 
+
 class NetworkAddress
 {
 public:

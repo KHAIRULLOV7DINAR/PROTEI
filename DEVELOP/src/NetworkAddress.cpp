@@ -1,9 +1,9 @@
-#include "../include/NetworkAddress.h"
-
 #include <vector>
 #include <sstream>
 #include <cstdint>
 #include <iostream>
+
+#include "../include/NetworkAddress.h"
 
 
 const std::vector<unsigned char>& NetworkAddress::get_ip() const

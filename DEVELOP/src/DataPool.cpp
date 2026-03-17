@@ -4,6 +4,7 @@
 
 #include "../include/DataPool.h"
 
+
 //Вектор
 template <typename T>
 const std::string TypedVector<T>::get_type() const

@@ -12,7 +12,7 @@ include_directories("./include")
 
 set(SOURCE_LIST
     src/main.cpp
-    src/log.cpp
+    src/Logger.cpp
     src/AppSettings.cpp
     src/DataPool.cpp
     src/Menu.cpp

@@ -9,6 +9,7 @@
 
 #include "./AppSettings.h"
 #include "./DataPool.h"
+#include "./Logger.h"
 
 
 //MenuItem
@@ -33,7 +34,7 @@ class Menu
 сохранение инвариантов классов AppSettings, DataPool
 */
 public:
-    Menu(DataPool& data_pool, AppSettings& app_settings);
+    Menu(Logger& file_logger, DataPool& data_pool, AppSettings& app_settings);
     ~Menu() = default;
     
     static void parse_input(std::string& command);
@@ -42,6 +43,7 @@ public:
     std::string current_type;
 
 protected:
+    Logger& logger_;
     DataPool& data_pool_;
     AppSettings& app_settings_;
     bool menu_flag_;
