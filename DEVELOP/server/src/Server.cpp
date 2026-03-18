@@ -64,35 +64,34 @@ void Server::set_up_server()
 
 void Server::handle_request(int client_socket)
 {
-    try
-    {
-        std::string received_data;
-        char buffer[1024];
+    std::string received_data;
+    char buffer[1024];
+    bool connection_open = true;
 
-        while (true)
+    while (connection_open)
+    {
+        ssize_t bytes = recv(client_socket, buffer, sizeof(buffer) - 1, 0);
+        if (bytes == 0)
         {
-            ssize_t bytes = recv(client_socket, buffer, sizeof(buffer) - 1, 0);
-            if(bytes <= 0)
-            {
-                throw std::runtime_error("Receiving data failed!");
-            }
-
-            buffer[bytes] = '\0';
-            received_data.append(buffer, bytes);
-            
-            // '\n' - конец форматированного json-а в строку
-            size_t position = received_data.find('\n');
-            if (position != std::string::npos)
-            {
-                std::string message = received_data.substr(0, position);
-                handle_response(client_socket, message);
-                break;
-            }
+            std::cout << "Client closed connection" << std::endl;
+            break;
         }
-    }
-    catch (const std::exception& ex)
-    {
-        std::cerr << "Error handling client: " << ex.what() << std::endl;
+        if (bytes < 0)
+        {
+            throw std::runtime_error("Receiving data failed!");
+        }
+
+        buffer[bytes] = '\0';
+        received_data.append(buffer, bytes);
+        
+        size_t position;
+        while ((position = received_data.find('\n')) != std::string::npos)
+        {
+            std::string message = received_data.substr(0, position);
+            handle_response(client_socket, message);
+            
+            received_data = received_data.substr(position + 1);
+        }
     }
 }
 
@@ -102,6 +101,13 @@ void Server::handle_response(int client_socket, const std::string& message)
 
     std::string type = request["type"];
     std::vector<double> vec = request["vector"];
+
+    std::cout << type << std::endl;
+    for(auto el: vec)
+    {
+        std::cout << el << ' ' << std::endl;
+    }
+
     //хоть клиент и должен блокировать отправку не 4-мерного вектора, но все же
     if (vec.size() != 4)
     {
@@ -111,7 +117,6 @@ void Server::handle_response(int client_socket, const std::string& message)
     nlohmann::json response;
     response["type"] = type;
 
-    //нужны шаблоны
     //пока просто на 2 умножение
     if (type == "int")
     {

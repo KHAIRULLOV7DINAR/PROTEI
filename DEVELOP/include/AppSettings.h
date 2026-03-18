@@ -18,12 +18,13 @@ port находится в диапазоне 0-65535;
 поле имени также непустое.
 */
 public:
-    AppSettings(int argc, char** argv);
+    AppSettings(int argc, char** argv, NetworkAddress& network_address);
     ~AppSettings() = default;
 
     // Геттеры
     const std::vector<unsigned char>& get_ip() const;
     unsigned short get_port() const;
+    NetworkAddress& get_network_address() const;
     std::string get_role() const;
     int get_i() const;
     std::string get_library() const;
@@ -40,7 +41,7 @@ private:
     std::unordered_map<std::string, std::string> default_values_;
 
     // Аргументы командной строки
-    NetworkAddress network_address_;
+    NetworkAddress& network_address_;
     std::string role_;
     int i_ = 0;
     std::string library_;

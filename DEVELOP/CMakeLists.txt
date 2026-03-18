@@ -17,7 +17,8 @@ set(SOURCE_LIST
     src/DataPool.cpp
     src/Menu.cpp
     src/Tests.cpp
-    src/NetworkAddress.cpp)
+    src/NetworkAddress.cpp
+    src/Client.cpp)
 
 #cppcheck
 #include(cmake/cppcheck.cmake)

@@ -5,6 +5,7 @@
 #include "../include/DataPool.h"
 #include "../include/Menu.h"
 #include "../include/Logger.h"
+#include "../include/Client.h"
 
 
 int main(int argc, char** argv)
@@ -19,9 +20,11 @@ int main(int argc, char** argv)
     
     try
     {
-        AppSettings app_settings(argc, argv);
+        NetworkAddress network_address;
+        AppSettings app_settings(argc, argv, network_address);
         DataPool data_pool;
-        Menu menu(logger, data_pool, app_settings);
+        Client client(network_address);
+        Menu menu(logger, data_pool, app_settings, client);
         
         menu.show_menu();
     }

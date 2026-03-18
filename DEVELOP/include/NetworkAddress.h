@@ -11,6 +11,8 @@ public:
     NetworkAddress() = default;
     ~NetworkAddress() = default;
 
+    const std::string& get_str_ip() const;
+    
     const std::vector<unsigned char>& get_ip() const;
     unsigned short get_port() const;
 
@@ -25,6 +27,7 @@ public:
 
 private:
     std::vector<unsigned char> ip_;
+    std::string str_ip_;
     unsigned short port_ = 0;
 };
 

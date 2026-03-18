@@ -11,6 +11,7 @@
 class BaseVector
 {
 public:
+    virtual ~BaseVector() = default; 
     virtual const std::string get_type() const = 0;
 
     virtual void print() const = 0;

@@ -6,6 +6,11 @@
 #include "../include/NetworkAddress.h"
 
 
+const std::string& NetworkAddress::get_str_ip() const
+{
+    return str_ip_;
+}
+
 const std::vector<unsigned char>& NetworkAddress::get_ip() const
 {
     return ip_;
@@ -18,6 +23,8 @@ unsigned short NetworkAddress::get_port() const
 
 void NetworkAddress::set_ip(const std::string& str_ip)
 {
+    str_ip_ = str_ip;
+
     std::vector<unsigned char> new_ip;
 
     std::stringstream ss_ip(str_ip);

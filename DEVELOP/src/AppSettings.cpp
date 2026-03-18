@@ -6,7 +6,7 @@
 #include "../include/AppSettings.h"
 
 
-AppSettings::AppSettings(int argc, char** argv) :
+AppSettings::AppSettings(int argc, char** argv, NetworkAddress& network_addreess) :
     string_values_{
         {"-a", ""},
         {"-p", ""},
@@ -20,7 +20,8 @@ AppSettings::AppSettings(int argc, char** argv) :
         {"-r", "Client"},
         {"-i", "0"},
         {"-L", "mylib"}
-    }
+    },
+    network_address_(network_addreess)
 {
     read_console_string(argc, argv);
     parse_console_string();
