@@ -6,6 +6,7 @@
 #include "../include/AppSettings.h"
 #include "../include/DataPool.h"
 #include "../include/Logger.h"
+#include "../include/Client.h"
 
 
 //Обертка для доступа к приват методам меню
@@ -24,11 +25,13 @@ class MenuTestFixture : public ::testing::Test
 protected:
     void SetUp() override
     {
-        char* argv[] = {const_cast<char*>("program"), const_cast<char*>("-a"), const_cast<char*>("127.127.127.127"), const_cast<char*>("-L"), const_cast<char*>("myLib")};
+        char* argv[] = {const_cast<char*>("program"), const_cast<char*>("-a"), const_cast<char*>("127.0.0.1"), const_cast<char*>("-p"), const_cast<char*>("1100"), const_cast<char*>("-L"), const_cast<char*>("myLib")};
+        network_address = std::make_unique<NetworkAddress>();
         logger = std::make_unique<Logger>("../logs/log.txt");
-        app_settings = std::make_unique<AppSettings>(5, argv);
+        app_settings = std::make_unique<AppSettings>(5, argv, *network_address);
         data_pool = std::make_unique<DataPool>();
-        menu = std::make_unique<MenuWrapper>(*logger, *data_pool, *app_settings);
+        client = std::make_unique<Client>(*network_address);
+        menu = std::make_unique<MenuWrapper>(*logger, *data_pool, *app_settings, *client);
     }
 
     void TearDown() override{}
@@ -44,9 +47,11 @@ protected:
     {
         std::cin.rdbuf(cin_buffer);
     }
+    std::unique_ptr<NetworkAddress> network_address;
     std::unique_ptr<Logger> logger;
     std::unique_ptr<AppSettings> app_settings;
     std::unique_ptr<DataPool> data_pool;
+    std::unique_ptr<Client> client;
     std::unique_ptr<MenuWrapper> menu;
     
     std::stringstream input_stream;

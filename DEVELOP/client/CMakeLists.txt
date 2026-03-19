@@ -6,7 +6,7 @@ option(BUILD_TESTS "Tests" OFF)
 
 #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fsanitize=address")
 
-project(HOME_TASK)
+project(CLIENT)
 
 include_directories("./include")
 
@@ -17,7 +17,8 @@ set(SOURCE_LIST
     src/DataPool.cpp
     src/Menu.cpp
     src/Tests.cpp
-    src/NetworkAddress.cpp)
+    src/NetworkAddress.cpp
+    src/Client.cpp)
 
 #cppcheck
 #include(cmake/cppcheck.cmake)

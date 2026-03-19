@@ -10,6 +10,7 @@
 #include "./AppSettings.h"
 #include "./DataPool.h"
 #include "./Logger.h"
+#include "./Client.h"
 
 
 //MenuItem
@@ -34,7 +35,7 @@ class Menu
 сохранение инвариантов классов AppSettings, DataPool
 */
 public:
-    Menu(Logger& file_logger, DataPool& data_pool, AppSettings& app_settings);
+    Menu(Logger& file_logger, DataPool& data_pool, AppSettings& app_settings, Client& client);
     ~Menu() = default;
     
     static void parse_input(std::string& command);
@@ -46,9 +47,9 @@ protected:
     Logger& logger_;
     DataPool& data_pool_;
     AppSettings& app_settings_;
+    Client& client_;
     bool menu_flag_;
     std::unordered_map<std::string, std::unique_ptr<MenuItem>> menu_items_;
-
     void add_menu_items();
     void input_name();
     void input_type();
@@ -56,6 +57,7 @@ protected:
     void print_settings() const;
     void print_help() const;
     void print_vectors() const;
+    void send_vector();
     void quit();
     void exit();
     MenuItem* find_item(const std::string& command);

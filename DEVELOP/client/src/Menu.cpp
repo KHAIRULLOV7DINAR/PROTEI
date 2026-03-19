@@ -26,7 +26,7 @@ void MenuItem::execute() const
 }
 
 //Menu
-Menu::Menu(Logger& file_logger, DataPool& data_pool, AppSettings& app_settings) :logger_(file_logger), menu_flag_(true), app_settings_(app_settings), data_pool_(data_pool)
+Menu::Menu(Logger& file_logger, DataPool& data_pool, AppSettings& app_settings, Client& client) :logger_(file_logger), menu_flag_(true), app_settings_(app_settings), data_pool_(data_pool), client_(client)
 {
     add_menu_items();
 };
@@ -79,6 +79,12 @@ void Menu::add_menu_items()
     menu_items_["vectors"] = std::make_unique<MenuItem>("vectors", [this]()
     {
         this->print_vectors();
+    });
+
+    // Команда send - отправка первого вектора из пула векторов на сервер для обработки
+    menu_items_["send"] = std::make_unique<MenuItem>("send", [this]()
+    {
+        this->send_vector();
     });
 }
 
@@ -226,6 +232,7 @@ void Menu::print_help() const
               << "Settings -\tshow app settings arguments\n"
               << "Help -\t\tshow available commands\n"
               << "Exit -\t\texit the program\n"
+              << "Send -\t\tsend the first vector in data pool to server\n"
               << "\nWarning! No multiple values are allowed in one string except for 4-d vector values! (cin.ignore used).\n"
               << std::endl;
 }
@@ -233,6 +240,38 @@ void Menu::print_help() const
 void Menu::print_vectors() const
 {
     data_pool_.print_vectors();
+}
+
+void Menu::send_vector()
+{
+    client_.get_vect(data_pool_.first());
+
+    std::unique_ptr<BaseVector> received;
+    
+    if (current_type == "int")
+    {
+        received = client_.receive_response<int>();
+    }
+    else if (current_type == "float")
+    {
+        received = client_.receive_response<float>();
+    }
+    else if (current_type == "double")
+    {
+        received = client_.receive_response<double>();
+    }
+    else
+    {
+        throw std::runtime_error("Unknown type for response!");
+    }
+    
+    if (received)
+    {
+        std::cout << "Response received: ";
+        received->print();
+
+        data_pool_.insert(std::move(received));
+    }
 }
 
 void Menu::exit()

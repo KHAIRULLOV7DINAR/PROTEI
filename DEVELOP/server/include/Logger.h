@@ -1,10 +1,11 @@
-#ifndef LOGGGER_H
-#define LOGGGER_H
+#ifndef LOGGER_H
+#define LOGGER_H
 
 #include <iostream>
 #include <fstream>
 #include <ctime>
 #include <string>
+#include <vector>
 
 
 class Logger
@@ -15,6 +16,10 @@ public:
 
     void file_log(const std::string& message);
     void file_log(std::exception& ex);
+
+    void vector_log(std::vector<double> vect);
+
+    void info_file_log(const std::string& message);
 
     void console_log(std::exception& ex);
     void console_log(const char* er);
