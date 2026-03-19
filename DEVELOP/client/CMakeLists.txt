@@ -6,7 +6,7 @@ option(BUILD_TESTS "Tests" OFF)
 
 #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fsanitize=address")
 
-project(HOME_TASK)
+project(CLIENT)
 
 include_directories("./include")
 

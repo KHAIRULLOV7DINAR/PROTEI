@@ -81,6 +81,7 @@ void Menu::add_menu_items()
         this->print_vectors();
     });
 
+    // Команда send - отправка первого вектора из пула векторов на сервер для обработки
     menu_items_["send"] = std::make_unique<MenuItem>("send", [this]()
     {
         this->send_vector();
@@ -231,6 +232,7 @@ void Menu::print_help() const
               << "Settings -\tshow app settings arguments\n"
               << "Help -\t\tshow available commands\n"
               << "Exit -\t\texit the program\n"
+              << "Send -\t\tsend the first vector in data pool to server\n"
               << "\nWarning! No multiple values are allowed in one string except for 4-d vector values! (cin.ignore used).\n"
               << std::endl;
 }

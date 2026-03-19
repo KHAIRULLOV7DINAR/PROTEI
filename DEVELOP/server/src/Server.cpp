@@ -3,9 +3,12 @@
 #include "../include/Server.h"
 
 
-Server::Server(short port) : port_(port)
+Server::Server(short port, Logger& logger) : port_(port), logger_(logger)
 {
     set_up_server();
+
+    logger.simple_console_log("Server was created!");
+    logger.info_file_log("Sever was created!");
 }
 
 Server::~Server()
@@ -74,6 +77,7 @@ void Server::handle_request(int client_socket)
         if (bytes == 0)
         {
             std::cout << "Client closed connection" << std::endl;
+            logger_.info_file_log("Client closed connection");
             break;
         }
         if (bytes < 0)
@@ -102,11 +106,10 @@ void Server::handle_response(int client_socket, const std::string& message)
     std::string type = request["type"];
     std::vector<double> vec = request["vector"];
 
-    std::cout << type << std::endl;
-    for(auto el: vec)
-    {
-        std::cout << el << ' ' << std::endl;
-    }
+    logger_.simple_console_log("Data was received!");
+    logger_.info_file_log("Data was received:\nType: " + type + " vector: ");
+
+    logger_.vector_log(vec);
 
     //хоть клиент и должен блокировать отправку не 4-мерного вектора, но все же
     if (vec.size() != 4)
@@ -142,6 +145,8 @@ void Server::handle_response(int client_socket, const std::string& message)
         throw std::runtime_error("Unknown type!");
     }
 
+    logger_.info_file_log("Vector was multiplied!");
+
     // '\n' - конец форматированного json-а в строку
     std::string response_str = response.dump() + "\n";
     send_response(client_socket, response_str.data(), response_str.size());
@@ -162,4 +167,6 @@ void Server::send_response(int client_socket, const void* data, size_t length)
         data_ptr += sent_size;
         remaining_size -= sent_size;
     }
+
+    logger_.info_file_log("Vector was sent in response!");
 }

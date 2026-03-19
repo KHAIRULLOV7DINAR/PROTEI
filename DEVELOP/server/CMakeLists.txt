@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.10)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-project(HOME_TASK_SERVER)
+project(SERVER)
 
 #поиск nlohmann-json3
 find_package(nlohmann_json REQUIRED)
@@ -11,7 +11,8 @@ include_directories("./include")
 
 set(SOURCE_LIST
     src/main.cpp
-    src/Server.cpp)
+    src/Server.cpp
+    src/Logger.cpp)
 
 add_executable(${PROJECT_NAME} ${SOURCE_LIST})
 

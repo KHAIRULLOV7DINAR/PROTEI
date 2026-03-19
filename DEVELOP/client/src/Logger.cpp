@@ -16,7 +16,10 @@ Logger::~Logger()
 
 void Logger::file_log(const std::string& message)
 {
-    if (!file_.is_open()) return;
+    if (!file_.is_open())
+    {
+        return;
+    }
 
     time_t rt;
     time(&rt);
