@@ -1,5 +1,4 @@
-#ifndef LOGGER_H
-#define LOGGER_H
+#pragma once
 
 #include <iostream>
 #include <fstream>
@@ -29,5 +28,3 @@ public:
 private:
     std::ofstream file_;
 };
-
-#endif

@@ -1,5 +1,4 @@
-#ifndef APPSETTINGS_H
-#define APPSETTINGS_H
+#pragma once
 
 #include <string>
 #include <vector>
@@ -55,5 +54,3 @@ private:
     void parse_i();
     void parse_console_string();
 };
-
-#endif

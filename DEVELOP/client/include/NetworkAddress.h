@@ -1,5 +1,4 @@
-#ifndef NETWORKADDRESS_H
-#define NETWORKADDRESS_H
+#pragma once
 
 #include <string>
 #include <vector>
@@ -30,6 +29,3 @@ private:
     std::string str_ip_;
     unsigned short port_ = 0;
 };
-
-
-#endif

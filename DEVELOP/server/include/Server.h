@@ -1,5 +1,4 @@
-#ifndef SERVER_H
-#define SERVER_H
+#pragma once
 
 #include <iostream>
 #include <cstring>
@@ -31,5 +30,3 @@ private:
     void handle_response(int client_socket, const std::string& message);
     void send_response(int client_socket, const void* data, size_t length);
 };
-
-#endif

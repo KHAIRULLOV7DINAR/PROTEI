@@ -1,5 +1,4 @@
-#ifndef TESTS_H
-#define TESTS_H
+#pragma once
 
 #include <vector>
 #include <string>
@@ -43,5 +42,3 @@ private:
     
     void validate_file_exists(const std::string& path) const;
 };
-
-#endif

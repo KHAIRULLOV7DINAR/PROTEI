@@ -1,5 +1,4 @@
-#ifndef CLIENT_H
-#define CLIENT_H
+#pragma once
 
 #include "NetworkAddress.h"
 #include "DataPool.h"
@@ -22,5 +21,3 @@ private:
     void send_raw_data(const void* data, size_t length);
     std::string receive_raw_data();
 };
-
-#endif

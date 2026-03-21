@@ -1,5 +1,4 @@
-#ifndef MENU_H
-#define MENU_H
+#pragma once
 
 #include <memory>
 #include <string>
@@ -62,5 +61,3 @@ protected:
     void exit();
     MenuItem* find_item(const std::string& command);
 };
-
-#endif

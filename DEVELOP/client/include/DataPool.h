@@ -1,5 +1,4 @@
-#ifndef DATAPOOL_H
-#define DATAPOOL_H
+#pragma once
 
 #include <string>
 #include <vector>
@@ -61,5 +60,3 @@ private:
     std::deque<std::unique_ptr<BaseVector>> pool_;
     std::vector<std::string> allowed_types_;
 };
-
-#endif
