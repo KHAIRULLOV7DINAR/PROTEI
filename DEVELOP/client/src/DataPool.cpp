@@ -43,7 +43,7 @@ template class TypedVector<float>;
 template class TypedVector<double>;
 
 //DataPool
-const std::vector<std::string>& DataPool::get_allowed_types()
+const std::array<std::string, 3>& DataPool::get_allowed_types()
 {
     return allowed_types_;
 }

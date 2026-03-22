@@ -37,7 +37,7 @@ public:
     Menu(Logger& file_logger, DataPool& data_pool, AppSettings& app_settings, Client& client);
     ~Menu() = default;
     
-    static void parse_input(std::string& command);
+    static void fix_input(std::string& command);
     void show_menu();
 
     std::string current_type;
@@ -48,7 +48,7 @@ protected:
     AppSettings& app_settings_;
     Client& client_;
     bool menu_flag_;
-    std::unordered_map<std::string, std::unique_ptr<MenuItem>> menu_items_;
+    std::unordered_map<std::string, MenuItem> menu_items_;
     void add_menu_items();
     void input_name();
     void input_type();

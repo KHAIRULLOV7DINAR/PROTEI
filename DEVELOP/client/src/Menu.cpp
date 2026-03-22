@@ -34,55 +34,55 @@ Menu::Menu(Logger& file_logger, DataPool& data_pool, AppSettings& app_settings, 
 void Menu::add_menu_items()
 {
     // Команда name - ввод имени программы
-    menu_items_["name"] = std::make_unique<MenuItem>("name", [this]()
+    menu_items_["name"] = MenuItem("name", [this]()
     {
         this->input_name();
     });
     
     // Команда type - выбор типа вектора
-    menu_items_["type"] = std::make_unique<MenuItem>("type", [this]()
+    menu_items_["type"] = MenuItem("type", [this]()
     {
         this->input_type();
     });
     
     // Команда vector - ввод вектора
-    menu_items_["vector"] = std::make_unique<MenuItem>("vector", [this]()
+    menu_items_["vector"] = MenuItem("vector", [this]()
     {
         this->input_vector();
     });
     
     // Команда console - показать настройки из командной строки
-    menu_items_["settings"] = std::make_unique<MenuItem>("settings", [this]()
+    menu_items_["settings"] = MenuItem("settings", [this]()
     {
         this->print_settings();
     });
     
     // Команда exit - выход из программы
-    menu_items_["exit"] = std::make_unique<MenuItem>("exit", [this]()
+    menu_items_["exit"] = MenuItem("exit", [this]()
     {
         this->exit();
     });
 
     // Команда quit - выход из программы
-    menu_items_["quit"] = std::make_unique<MenuItem>("quit", [this]()
+    menu_items_["quit"] = MenuItem("quit", [this]()
     {
         this->quit();
     });
 
     // Команда help - вывод справки по командам
-    menu_items_["help"] = std::make_unique<MenuItem>("help", [this]()
+    menu_items_["help"] = MenuItem("help", [this]()
     {
         this->print_help();
     });
 
     // Команда vectors - вывод записанных векторов
-    menu_items_["vectors"] = std::make_unique<MenuItem>("vectors", [this]()
+    menu_items_["vectors"] = MenuItem("vectors", [this]()
     {
         this->print_vectors();
     });
 
     // Команда send - отправка первого вектора из пула векторов на сервер для обработки
-    menu_items_["send"] = std::make_unique<MenuItem>("send", [this]()
+    menu_items_["send"] = MenuItem("send", [this]()
     {
         this->send_vector();
     });
@@ -103,11 +103,11 @@ void Menu::input_name()
 void Menu::input_type()
 {
     std::string new_type;
-    const std::vector<std::string>& allowed_types = data_pool_.get_allowed_types();
+    const std::array<std::string, 3>& allowed_types = data_pool_.get_allowed_types();
 
     std::cout << "\nEnter type for vector:\n" << std::endl;
     std::cin >> new_type;
-    parse_input(new_type);
+    fix_input(new_type);
 
     if(std::find(allowed_types.begin(), allowed_types.end(), new_type) == allowed_types.end())
     {
@@ -287,17 +287,24 @@ void Menu::quit()
     exit();
 }
 
-void Menu::parse_input(std::string& command)
+void Menu::fix_input(std::string& command)
 {
-    std::string result;
+    if(command.empty())
+    {
+        return;
+    }
+
+    char* char_ptr = &command[0];
+
     for (char c : command)
     {
         if (std::isalnum(static_cast<unsigned char>(c)))
         {
-            result += std::tolower(static_cast<unsigned char>(c));
+            *char_ptr = std::tolower(static_cast<unsigned char>(c));
+            ++char_ptr;
         }
     }
-    command = result;
+    command.resize(char_ptr - &command[0]);
 }
 
 void Menu::show_menu()
@@ -312,7 +319,7 @@ void Menu::show_menu()
     {
         std::cout << "\nEnter new command:\n" << std::endl;
         std::cin >> new_command;
-        parse_input(new_command);
+        fix_input(new_command);
         std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');  
 
         MenuItem* item = find_item(new_command);
@@ -340,7 +347,7 @@ MenuItem* Menu::find_item(const std::string& command)
     auto pair = menu_items_.find(command);
     if (pair != menu_items_.end())
     {
-        return pair->second.get();
+        return &(pair->second);
     }
     return nullptr;
 }

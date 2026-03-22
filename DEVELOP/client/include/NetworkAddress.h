@@ -7,8 +7,6 @@
 class NetworkAddress
 {
 public:
-    NetworkAddress() = default;
-    ~NetworkAddress() = default;
 
     const std::string& get_str_ip() const;
     
