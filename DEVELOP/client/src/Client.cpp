@@ -10,7 +10,7 @@
 
 using json = nlohmann::json;
 
-Client::Client(NetworkAddress& network_address) : network_address_(network_address)
+Client::Client(NetworkAddress& network_address) : network_address_(network_address), server_socket_(-1)
 {
     set_up_server_connection();
 }
@@ -33,7 +33,7 @@ void Client::set_up_server_connection()
 
     sockaddr_in server_addr{};
     server_addr.sin_family = AF_INET;
-    server_addr.sin_port = htons(network_address_.get_port());;
+    server_addr.sin_port = htons(network_address_.get_port());
 
     const char* str_ip = (network_address_.get_str_ip()).c_str();
 
@@ -109,17 +109,33 @@ void Client::send_raw_data(const void* data, size_t length)
 
 std::string Client::receive_raw_data()
 {
-    std::string result;
-    char ch;
-    while (recv(server_socket_, &ch, 1, 0) == 1)
+    constexpr size_t CHUNK_SIZE = 1024;
+    char chunk[CHUNK_SIZE];
+
+    while (true)
     {
-        if (ch == '\n')
+        size_t pos = buffer_.find('\n');
+        if (pos != std::string::npos)
         {
-            break;
+            std::string result = buffer_.substr(0, pos);
+            buffer_ = buffer_.substr(pos + 1);
+            return result;
         }
-        result += ch;
+
+        ssize_t bytes = recv(server_socket_, chunk, CHUNK_SIZE, 0);
+        if (bytes == -1)
+        {
+            throw std::runtime_error(std::string("Receiving error: ") + strerror(errno));
+        }
+        if (bytes == 0)
+        {
+            std::string result = buffer_;
+            buffer_.clear();
+            return result;
+        }
+
+        buffer_.append(chunk, bytes);
     }
-    return result;
 }
 
 template void Client::send_vector<int>(std::unique_ptr<TypedVector<int>>);

@@ -21,7 +21,7 @@ public:
     ~AppSettings() = default;
 
     // Геттеры
-    const std::vector<unsigned char>& get_ip() const;
+    const std::array<std::byte, 4>& get_ip() const;
     unsigned short get_port() const;
     NetworkAddress& get_network_address() const;
     std::string get_role() const;

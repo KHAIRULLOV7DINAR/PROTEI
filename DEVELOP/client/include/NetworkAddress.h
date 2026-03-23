@@ -1,7 +1,7 @@
 #pragma once
 
 #include <string>
-#include <vector>
+#include <array>
 
 
 class NetworkAddress
@@ -10,7 +10,7 @@ public:
 
     const std::string& get_str_ip() const;
     
-    const std::vector<unsigned char>& get_ip() const;
+    const std::array<std::byte, 4>& get_ip() const;
     unsigned short get_port() const;
 
     void set_ip(const std::string& str_ip);
@@ -23,7 +23,7 @@ public:
     void print_address() const;
 
 private:
-    std::vector<unsigned char> ip_;
+    std::array<std::byte, 4> ip_;
     std::string str_ip_;
     unsigned short port_ = 0;
 };

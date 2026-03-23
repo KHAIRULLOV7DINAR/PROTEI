@@ -7,7 +7,6 @@
 #include <array>
 
 
-//Классы для хранения векторов
 class BaseVector
 {
 public:
@@ -49,7 +48,10 @@ public:
         "float",
         "double"
     }{};
-    
+
+    const std::string& get_current_input_type() const;
+
+    void set_current_input_type(const std::string& new_type);
     const std::array<std::string, 3>& get_allowed_types();
 
     void insert(std::unique_ptr<BaseVector> vec);
@@ -60,4 +62,6 @@ public:
 private:
     std::deque<std::unique_ptr<BaseVector>> pool_;
     std::array<std::string, 3> allowed_types_;
+
+    std::string current_input_type_;
 };

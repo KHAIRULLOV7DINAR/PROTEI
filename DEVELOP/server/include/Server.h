@@ -10,7 +10,7 @@
 //nlohmann-json3-dev
 #include <nlohmann/json.hpp>
 
-#include "Logger.h"
+#include "../../utils/Logger.h"
 
 class Server
 {
@@ -21,9 +21,10 @@ public:
 
 private:
     Logger& logger_;
-    bool cycle_flag_;
+    bool cycle_flag_ = false;
     const short port_;
-    int socket_;
+    int socket_ = -1;
+    std::string buffer_;
 
     void set_up_server();
     void handle_request(int client_socket);

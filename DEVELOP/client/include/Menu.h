@@ -8,7 +8,7 @@
 
 #include "./AppSettings.h"
 #include "./DataPool.h"
-#include "./Logger.h"
+#include "../../utils/Logger.h"
 #include "./Client.h"
 
 
@@ -16,14 +16,87 @@
 class MenuItem
 {
 public:
-    MenuItem(const std::string& command_name, std::function<void()> f_action);
+    virtual ~MenuItem() = default;
     
-    const std::string& get_command_name() const;
-    void execute() const;
+    virtual void execute() const = 0;
+};
 
+//наследники 
+class NameItem : public MenuItem
+{
+public: 
+    NameItem(AppSettings& app_settings);
+
+    void execute() const override;
 private:
-    std::string command_name_;
-    std::function<void()> f_action_;
+    AppSettings& app_settings_;
+};
+
+class TypeItem : public MenuItem
+{
+public: 
+    TypeItem(DataPool& data_pool);
+
+    void execute() const override;
+private:
+    DataPool& data_pool_;
+};
+
+class VectorItem : public MenuItem
+{
+public: 
+    VectorItem(DataPool& data_pool);
+
+    void execute() const override;
+private:
+    DataPool& data_pool_;
+};
+
+class SettingsItem : public MenuItem
+{
+public: 
+    SettingsItem(AppSettings& app_settings);
+
+    void execute() const override;
+private:
+    AppSettings& app_settings_;
+};
+
+class HelpItem : public MenuItem
+{
+public: 
+    void execute() const override;
+};
+
+class VectorsItem : public MenuItem
+{
+public: 
+    VectorsItem(DataPool& data_pool);
+
+    void execute() const override;
+private:
+    DataPool& data_pool_;
+};
+
+class SendItem : public MenuItem
+{
+public: 
+    SendItem(Client& client, DataPool& data_pool);
+
+    void execute() const override;
+private:
+    Client& client_;
+    DataPool& data_pool_;
+};
+
+class ExitQuitItem : public MenuItem
+{
+public: 
+    ExitQuitItem(bool& menu_flag);
+
+    void execute() const override;
+private:
+    bool& menu_flag_;
 };
 
 //Menu
@@ -34,30 +107,15 @@ class Menu
 сохранение инвариантов классов AppSettings, DataPool
 */
 public:
-    Menu(Logger& file_logger, DataPool& data_pool, AppSettings& app_settings, Client& client);
-    ~Menu() = default;
-    
-    static void fix_input(std::string& command);
+    Menu(Logger& logger, bool& running);
+
+    void add_item(const std::string& command, std::unique_ptr<MenuItem> item);
     void show_menu();
 
-    std::string current_type;
-
-protected:
+private:
     Logger& logger_;
-    DataPool& data_pool_;
-    AppSettings& app_settings_;
-    Client& client_;
-    bool menu_flag_;
-    std::unordered_map<std::string, MenuItem> menu_items_;
-    void add_menu_items();
-    void input_name();
-    void input_type();
-    void input_vector();
-    void print_settings() const;
-    void print_help() const;
-    void print_vectors() const;
-    void send_vector();
-    void quit();
-    void exit();
+    bool& running_; 
+    std::unordered_map<std::string, std::unique_ptr<MenuItem>> items_;
+
     MenuItem* find_item(const std::string& command);
 };

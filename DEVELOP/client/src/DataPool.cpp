@@ -43,6 +43,16 @@ template class TypedVector<float>;
 template class TypedVector<double>;
 
 //DataPool
+const std::string& DataPool::get_current_input_type() const
+{
+    return current_input_type_;
+}
+
+void DataPool::set_current_input_type(const std::string& new_type)
+{
+    current_input_type_ = new_type;
+}
+
 const std::array<std::string, 3>& DataPool::get_allowed_types()
 {
     return allowed_types_;

@@ -16,6 +16,7 @@ public:
 private:
     NetworkAddress& network_address_;
     int server_socket_;
+    std::string buffer_;
 
     void set_up_server_connection();
     void send_raw_data(const void* data, size_t length);

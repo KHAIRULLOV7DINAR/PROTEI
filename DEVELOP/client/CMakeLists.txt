@@ -12,13 +12,14 @@ include_directories("./include")
 
 set(SOURCE_LIST
     src/main.cpp
-    src/Logger.cpp
     src/AppSettings.cpp
     src/DataPool.cpp
     src/Menu.cpp
     src/Tests.cpp
     src/NetworkAddress.cpp
-    src/Client.cpp)
+    src/Client.cpp
+    ../utils/utils.cpp
+    ../utils/Logger.cpp)
 
 #cppcheck
 #include(cmake/cppcheck.cmake)

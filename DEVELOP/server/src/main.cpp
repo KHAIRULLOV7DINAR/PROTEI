@@ -1,9 +1,9 @@
 #include "../include/Server.h"
-#include "../include/Logger.h"
+#include "../../utils/Logger.h"
 
 int main()
 {
-    Logger logger("../logs/log.txt");
+    Logger logger;
 
     try
     {

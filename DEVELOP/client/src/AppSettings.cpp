@@ -27,7 +27,7 @@ AppSettings::AppSettings(int argc, char** argv, NetworkAddress& network_addreess
     parse_console_string();
 }
 
-const std::vector<unsigned char>& AppSettings::get_ip() const
+const std::array<std::byte, 4>& AppSettings::get_ip() const
 {
     return network_address_.get_ip();
 }
