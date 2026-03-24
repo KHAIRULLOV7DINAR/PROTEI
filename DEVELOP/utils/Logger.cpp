@@ -2,6 +2,7 @@
 #include <chrono>
 #include <iomanip>
 #include <sstream>
+#include <mutex>
 
 #include "Logger.h"
 
@@ -41,9 +42,9 @@ Logger::Logger()
     open_file(generate_log_filename());
 }
 
-
 void Logger::file_log(const std::string& message)
 {
+    std::lock_guard<std::mutex> lock(mutex_);
     if (!file_.is_open())
     {
         return;
@@ -58,22 +59,19 @@ void Logger::file_log(const std::string& message)
     file_ << message << "\n" << std::endl;
 }
 
-void Logger::vector_log(std::vector<double> vect)
+void Logger::file_log(std::exception& ex)
 {
-    for( auto el : vect)
-    {
-        file_ << el << ' ';
-    }
-    file_ << '\n' << std::endl;
+    file_log(ex.what());
 }
 
-void Logger::file_log(std::exception& ex)
+void Logger::file_log(const std::exception& ex)
 {
     file_log(ex.what());
 }
 
 void Logger::info_file_log(const std::string& message)
 {
+    std::lock_guard<std::mutex> lock(mutex_);
     if (!file_.is_open())
     {
         return;
@@ -88,8 +86,20 @@ void Logger::info_file_log(const std::string& message)
     file_ << message << "\n" << std::endl;
 }
 
+void Logger::vector_log(std::vector<double> vect)
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    for (auto el : vect)
+    {
+        file_ << el << ' ';
+    }
+    
+    file_ << '\n' << std::endl;
+}
+
 void Logger::console_log(std::exception& ex)
 {
+    std::lock_guard<std::mutex> lock(mutex_);
     time_t rt;
     struct tm* ti;
     time(&rt);
@@ -102,6 +112,7 @@ void Logger::console_log(std::exception& ex)
 
 void Logger::console_log(const char* er)
 {
+    std::lock_guard<std::mutex> lock(mutex_);
     time_t rt;
     struct tm* ti;
     time(&rt);
@@ -114,7 +125,14 @@ void Logger::console_log(const char* er)
 
 void Logger::simple_console_log(const char* er)
 {
+    std::lock_guard<std::mutex> lock(mutex_);
     std::cout << er << '\n' << std::endl;
+}
+
+void Logger::simple_console_log(const std::string& msg)
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    std::cout << msg << '\n' << std::endl;
 }
 
 void Logger::simple_console_log(std::exception& ex)

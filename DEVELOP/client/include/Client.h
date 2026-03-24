@@ -8,7 +8,7 @@ class Client
 public:
     Client(NetworkAddress& network_address);
     ~Client();
-    void get_vect(std::unique_ptr<BaseVector> vec);
+    void pass_typed_vector(std::unique_ptr<BaseVector> vec);
     template <typename T>
     void send_vector(std::unique_ptr<TypedVector<T>> vect);
     template <typename T>

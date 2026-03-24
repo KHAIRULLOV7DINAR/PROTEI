@@ -1,40 +1,35 @@
-#include <nlohmann/json.hpp>
+#include <thread>
+#include <chrono>
+#include <cstring>
+#include <string>
 
 #include "../include/Server.h"
 
 
-Server::Server(short port, Logger& logger) : logger_(logger), port_(port), socket_(-1), cycle_flag_(false)
+Server::Server(short port, Logger& logger) : logger_(logger), port_(port)
 {
     set_up_server();
-
-    logger.simple_console_log("Server was created!");
-    logger.info_file_log("Server was created!");
+    logger_.simple_console_log("Server was created!");
+    logger_.info_file_log("Server was created!");
 }
 
 Server::~Server()
 {
-    if(socket_ != -1)
+    stop();
+    if (socket_ != -1)
     {
         close(socket_);
     }
 }
 
-void Server::main_cycle()
+void Server::stop()
 {
-    while(cycle_flag_)
-    {
-        int client = accept ( socket_, nullptr, nullptr );
-        
-        handle_request(client);
-        
-        shutdown ( client, SHUT_RDWR );
-        close ( client );
-    }
+    running_ = false;  
 }
 
 void Server::set_up_server()
 {
-    socket_ = socket ( PF_INET, SOCK_STREAM, IPPROTO_TCP );
+    socket_ = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP);
     if (socket_ == -1)
     {
         throw std::runtime_error("Creating server socket failed!");
@@ -48,125 +43,162 @@ void Server::set_up_server()
     sock_addr.sin_port = htons(port_);
     sock_addr.sin_addr.s_addr = htonl(INADDR_ANY);
 
-    if(bind( socket_, (struct sockaddr*) &sock_addr, sizeof(sock_addr)) == -1)
+    if (bind(socket_, (struct sockaddr*)&sock_addr, sizeof(sock_addr)) == -1)
     {
         close(socket_);
         socket_ = -1;
         throw std::runtime_error("Binding socket failed!");
-    };
+    }
 
-    if(listen( socket_, 10 ) == -1)
+    if (listen(socket_, 10) == -1)
     {
         close(socket_);
         socket_ = -1;
         throw std::runtime_error("Listening socket failed!");
-    };
+    }
 
-    cycle_flag_ = true;
+    running_ = true;
 }
 
-void Server::handle_request(int client_socket)
+void Server::main_cycle()
 {
-    buffer_.clear();
+    int next_client_id = 0;
+
+    while (running_)
+    {
+        while (running_ && active_clients_ >= MAX_CLIENTS)
+        {
+            std::this_thread::sleep_for(std::chrono::milliseconds(100));
+        }
+
+        if (!running_)
+        {
+            break;
+        }
+
+        int client_socket = accept(socket_, nullptr, nullptr);
+        if (client_socket < 0)
+        {
+            if (running_)
+                logger_.simple_console_log("Accepting failed!");
+            continue;
+        }
+
+        active_clients_++;
+        int client_id = ++next_client_id;
+
+        logger_.simple_console_log("New client connected, ID: " + std::to_string(client_id) + '\n');
+
+        try
+        {
+            std::thread client_thread(handle_client, client_socket, std::ref(logger_), client_id, std::ref(running_), std::ref(active_clients_));
+            client_thread.detach();   
+        }
+        catch (const std::exception& ex)
+        {
+            active_clients_--;
+            close(client_socket);
+            logger_.simple_console_log("Failed to create thread: " + std::string(ex.what()));
+        }
+    }
+}
+
+void Server::handle_client(int client_socket, Logger& logger, int client_id, std::atomic<bool>& running, std::atomic<int>& active_clients)
+{
+    std::string buffer;
 
     constexpr size_t CHUNK_SIZE = 1024;
     char chunk[CHUNK_SIZE];
 
-    while (true)
+    try
     {
-        size_t pos = buffer_.find('\n');
-        if (pos != std::string::npos)
+        while (running)
         {
-            std::string message = buffer_.substr(0, pos);
-            buffer_ = buffer_.substr(pos + 1);
-            handle_response(client_socket, message);
-            continue;
+            size_t pos = buffer.find('\n');
+            if (pos != std::string::npos)
+            {
+                std::string message = buffer.substr(0, pos);
+                buffer.erase(0, pos + 1);
+
+                nlohmann::json request = nlohmann::json::parse(message);
+                std::string type = request["type"];
+                std::vector<double> vec = request["vector"];
+
+                logger.simple_console_log("Received from client " + std::to_string(client_id));
+                logger.info_file_log("Client " + std::to_string(client_id) + ": Type " + type + '\n');
+
+                if (vec.size() != 4)
+                {
+                    throw std::runtime_error("Vector size does not equal 4!");
+                }
+
+                nlohmann::json response;
+                response["type"] = type;
+
+                // *2
+                if (type == "int")
+                {
+                    std::vector<int> int_vec(vec.begin(), vec.end());
+                    for (int& v : int_vec) v *= 2;
+                    response["vector"] = int_vec;
+                }
+                else if (type == "float")
+                {
+                    std::vector<float> float_vec(vec.begin(), vec.end());
+                    for (float& v : float_vec) v *= 2.0f;
+                    response["vector"] = float_vec;
+                }
+                else if (type == "double")
+                {
+                    std::vector<double> double_vec = vec;
+                    for (double& v : double_vec) v *= 2.0;
+                    response["vector"] = double_vec;
+                }
+                else
+                {
+                    throw std::runtime_error("Unknown type!");
+                }
+
+                std::string response_str = response.dump() + "\n";
+                const char* data_ptr = response_str.data();
+                size_t remaining = response_str.size();
+
+                while (remaining > 0)
+                {
+                    ssize_t sent = send(client_socket, data_ptr, remaining, 0);
+                    if (sent == -1)
+                    {
+                        throw std::runtime_error("Sending error!");
+                    }
+                    data_ptr += sent;
+                    remaining -= sent;
+                }
+
+                logger.info_file_log("Response sent to client " + std::to_string(client_id));
+            }
+            else
+            {
+                ssize_t bytes = recv(client_socket, chunk, CHUNK_SIZE, 0);
+                if (bytes == 0)
+                {
+                    logger.simple_console_log("Client " + std::to_string(client_id) + " closed connection!");
+                    break;
+                }
+                if (bytes < 0)
+                {
+                    throw std::runtime_error("Receiving error!");
+                }
+                buffer.append(chunk, bytes);
+            }
         }
-
-        ssize_t bytes = recv(client_socket, chunk, CHUNK_SIZE, 0);
-        if (bytes == 0)
-        {
-            std::cout << "Client closed connection!" << std::endl;
-            logger_.info_file_log("Client closed connection!");
-            break;
-        }
-        if (bytes < 0)
-        {
-            throw std::runtime_error("Receiving data failed!");
-        }
-
-        buffer_.append(chunk, bytes);
     }
-}
-
-void Server::handle_response(int client_socket, const std::string& message)
-{
-    nlohmann::json request = nlohmann::json::parse(message);
-
-    std::string type = request["type"];
-    std::vector<double> vec = request["vector"];
-
-    logger_.simple_console_log("Data was received!");
-    logger_.info_file_log("Data was received:\nType: " + type + " vector: ");
-
-    logger_.vector_log(vec);
-
-    //хоть клиент и должен блокировать отправку не 4-мерного вектора, но все же
-    if (vec.size() != 4)
+    catch (const std::exception& ex)
     {
-        throw std::runtime_error("Vector must have 4 elements");
+        logger.simple_console_log("Error in client " + std::to_string(client_id) + ": " + ex.what() + '\n');
+        logger.file_log(ex);
     }
 
-    nlohmann::json response;
-    response["type"] = type;
-
-    //пока просто на 2 умножение
-    if (type == "int")
-    {
-        std::vector<int> int_vec(vec.begin(), vec.end());
-        for (int& v : int_vec) v *= 2;
-        response["vector"] = int_vec;
-    }
-    else if (type == "float")
-    {
-        std::vector<float> float_vec(vec.begin(), vec.end());
-        for (float& v : float_vec) v *= 2.0f;
-        response["vector"] = float_vec;
-    }
-    else if (type == "double")
-    {
-        std::vector<double> double_vec = vec;
-        for (double& v : double_vec) v *= 2.0;
-        response["vector"] = double_vec;
-    }
-    else
-    {
-        //клиент должен блокировать отправку несуществующего типа
-        throw std::runtime_error("Unknown type!");
-    }
-
-    logger_.info_file_log("Vector was multiplied!");
-
-    // '\n' - конец форматированного json-а в строку
-    std::string response_str = response.dump() + "\n";
-    send_response(client_socket, response_str.data(), response_str.size());
-}
-
-void Server::send_response(int client_socket, const void* data, size_t length)
-{
-    const char* data_ptr = static_cast<const char*>(data);
-    size_t remaining_size = length;
-
-    while (remaining_size > 0)
-    {
-        ssize_t sent_size = send(client_socket, data_ptr, remaining_size, 0);
-        if (sent_size == -1)
-        {
-            throw std::runtime_error("Sending response error!");
-        }
-        data_ptr += sent_size;
-        remaining_size -= sent_size;
-    }
-
-    logger_.info_file_log("Vector was sent in response!");
+    close(client_socket);
+    active_clients--;
+    logger.simple_console_log("Client " + std::to_string(client_id) + " disconnected!\n");
 }

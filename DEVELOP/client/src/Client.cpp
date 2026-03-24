@@ -48,7 +48,7 @@ void Client::set_up_server_connection()
     }
 }
 
-void Client::get_vect(std::unique_ptr<BaseVector> vect)
+void Client::pass_typed_vector(std::unique_ptr<BaseVector> vect)
 {
     if (dynamic_cast<TypedVector<int>*>(vect.get()))
     {
