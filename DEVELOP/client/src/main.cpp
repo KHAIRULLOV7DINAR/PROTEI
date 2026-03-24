@@ -38,6 +38,7 @@ int main(int argc, char** argv)
     catch (std::exception& ex)
     {
         logger.console_log(ex);
+        logger.file_log(ex);
     }
 
     return 0;

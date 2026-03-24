@@ -189,7 +189,7 @@ void SendItem::execute() const
     std::unique_ptr<BaseVector> first_vect = data_pool_.first();
     const std::string& current_type = first_vect->get_type();
 
-    client_.get_vect(std::move(first_vect));
+    client_.pass_typed_vector(std::move(first_vect));
 
 
     std::unique_ptr<BaseVector> received;
