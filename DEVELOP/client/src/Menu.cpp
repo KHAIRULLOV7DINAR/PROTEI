@@ -39,7 +39,6 @@ void TypeItem::execute() const
 
     if(std::find(allowed_types.begin(), allowed_types.end(), new_type) == allowed_types.end())
     {
-        //Invalid type (couldn't find input_type in allowed types list)
         throw std::invalid_argument("Invalid type value!");
     }
     else
