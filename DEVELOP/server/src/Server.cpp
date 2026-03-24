@@ -3,12 +3,12 @@
 #include "../include/Server.h"
 
 
-Server::Server(short port, Logger& logger) : port_(port), logger_(logger)
+Server::Server(short port, Logger& logger) : logger_(logger), port_(port), socket_(-1), cycle_flag_(false)
 {
     set_up_server();
 
     logger.simple_console_log("Server was created!");
-    logger.info_file_log("Sever was created!");
+    logger.info_file_log("Server was created!");
 }
 
 Server::~Server()
@@ -51,14 +51,14 @@ void Server::set_up_server()
     if(bind( socket_, (struct sockaddr*) &sock_addr, sizeof(sock_addr)) == -1)
     {
         close(socket_);
-
+        socket_ = -1;
         throw std::runtime_error("Binding socket failed!");
     };
 
     if(listen( socket_, 10 ) == -1)
     {
         close(socket_);
-
+        socket_ = -1;
         throw std::runtime_error("Listening socket failed!");
     };
 
@@ -67,17 +67,27 @@ void Server::set_up_server()
 
 void Server::handle_request(int client_socket)
 {
-    std::string received_data;
-    char buffer[1024];
-    bool connection_open = true;
+    buffer_.clear();
 
-    while (connection_open)
+    constexpr size_t CHUNK_SIZE = 1024;
+    char chunk[CHUNK_SIZE];
+
+    while (true)
     {
-        ssize_t bytes = recv(client_socket, buffer, sizeof(buffer) - 1, 0);
+        size_t pos = buffer_.find('\n');
+        if (pos != std::string::npos)
+        {
+            std::string message = buffer_.substr(0, pos);
+            buffer_ = buffer_.substr(pos + 1);
+            handle_response(client_socket, message);
+            continue;
+        }
+
+        ssize_t bytes = recv(client_socket, chunk, CHUNK_SIZE, 0);
         if (bytes == 0)
         {
-            std::cout << "Client closed connection" << std::endl;
-            logger_.info_file_log("Client closed connection");
+            std::cout << "Client closed connection!" << std::endl;
+            logger_.info_file_log("Client closed connection!");
             break;
         }
         if (bytes < 0)
@@ -85,17 +95,7 @@ void Server::handle_request(int client_socket)
             throw std::runtime_error("Receiving data failed!");
         }
 
-        buffer[bytes] = '\0';
-        received_data.append(buffer, bytes);
-        
-        size_t position;
-        while ((position = received_data.find('\n')) != std::string::npos)
-        {
-            std::string message = received_data.substr(0, position);
-            handle_response(client_socket, message);
-            
-            received_data = received_data.substr(position + 1);
-        }
+        buffer_.append(chunk, bytes);
     }
 }
 

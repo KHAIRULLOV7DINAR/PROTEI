@@ -1,5 +1,4 @@
-#ifndef SERVER_H
-#define SERVER_H
+#pragma once
 
 #include <iostream>
 #include <cstring>
@@ -11,7 +10,7 @@
 //nlohmann-json3-dev
 #include <nlohmann/json.hpp>
 
-#include "Logger.h"
+#include "../../utils/Logger.h"
 
 class Server
 {
@@ -22,14 +21,13 @@ public:
 
 private:
     Logger& logger_;
-    bool cycle_flag_;
+    bool cycle_flag_ = false;
     const short port_;
-    int socket_;
+    int socket_ = -1;
+    std::string buffer_;
 
     void set_up_server();
     void handle_request(int client_socket);
     void handle_response(int client_socket, const std::string& message);
     void send_response(int client_socket, const void* data, size_t length);
 };
-
-#endif

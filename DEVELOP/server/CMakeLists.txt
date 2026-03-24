@@ -12,7 +12,7 @@ include_directories("./include")
 set(SOURCE_LIST
     src/main.cpp
     src/Server.cpp
-    src/Logger.cpp)
+    ../utils/Logger.cpp)
 
 add_executable(${PROJECT_NAME} ${SOURCE_LIST})
 

@@ -1,5 +1,4 @@
-#ifndef LOGGER_H
-#define LOGGER_H
+#pragma once
 
 #include <iostream>
 #include <fstream>
@@ -11,8 +10,7 @@
 class Logger
 {
 public:
-    Logger(const std::string& filename = "../logs/log.txt");
-    ~Logger();
+    Logger();
 
     void file_log(const std::string& message);
     void file_log(std::exception& ex);
@@ -28,6 +26,7 @@ public:
     void simple_console_log(std::exception& ex);
 private:
     std::ofstream file_;
-};
 
-#endif
+    static std::string generate_log_filename();
+    void open_file(const std::string& filename);
+};

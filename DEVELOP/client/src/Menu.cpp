@@ -5,90 +5,15 @@
 #include <cstdlib>
 
 #include "../include/Menu.h"
-#include "../include/Logger.h"
+#include "../../utils/utils.h"
 
 
-//MenuItem
-MenuItem::MenuItem(const std::string& command_name, std::function<void()> f_action)
-    : command_name_(command_name), f_action_(f_action){}
+//MenuItems:
 
-const std::string& MenuItem::get_command_name() const
-{
-    return command_name_;
-}
+//NameItem
+NameItem::NameItem(AppSettings& app_settings) : app_settings_(app_settings){}
 
-void MenuItem::execute() const
-{
-    if (f_action_)
-    {
-        f_action_();
-    }
-}
-
-//Menu
-Menu::Menu(Logger& file_logger, DataPool& data_pool, AppSettings& app_settings, Client& client) :logger_(file_logger), menu_flag_(true), app_settings_(app_settings), data_pool_(data_pool), client_(client)
-{
-    add_menu_items();
-};
-
-void Menu::add_menu_items()
-{
-    // Команда name - ввод имени программы
-    menu_items_["name"] = std::make_unique<MenuItem>("name", [this]()
-    {
-        this->input_name();
-    });
-    
-    // Команда type - выбор типа вектора
-    menu_items_["type"] = std::make_unique<MenuItem>("type", [this]()
-    {
-        this->input_type();
-    });
-    
-    // Команда vector - ввод вектора
-    menu_items_["vector"] = std::make_unique<MenuItem>("vector", [this]()
-    {
-        this->input_vector();
-    });
-    
-    // Команда console - показать настройки из командной строки
-    menu_items_["settings"] = std::make_unique<MenuItem>("settings", [this]()
-    {
-        this->print_settings();
-    });
-    
-    // Команда exit - выход из программы
-    menu_items_["exit"] = std::make_unique<MenuItem>("exit", [this]()
-    {
-        this->exit();
-    });
-
-    // Команда quit - выход из программы
-    menu_items_["quit"] = std::make_unique<MenuItem>("quit", [this]()
-    {
-        this->quit();
-    });
-
-    // Команда help - вывод справки по командам
-    menu_items_["help"] = std::make_unique<MenuItem>("help", [this]()
-    {
-        this->print_help();
-    });
-
-    // Команда vectors - вывод записанных векторов
-    menu_items_["vectors"] = std::make_unique<MenuItem>("vectors", [this]()
-    {
-        this->print_vectors();
-    });
-
-    // Команда send - отправка первого вектора из пула векторов на сервер для обработки
-    menu_items_["send"] = std::make_unique<MenuItem>("send", [this]()
-    {
-        this->send_vector();
-    });
-}
-
-void Menu::input_name()
+void NameItem::execute() const
 {
     std::string name;
 
@@ -100,31 +25,38 @@ void Menu::input_name()
     std::cout << "\nName for the program was entered.\n" << std::endl;
 }
 
-void Menu::input_type()
+//TypeItem
+TypeItem::TypeItem(DataPool& data_pool) : data_pool_(data_pool){}
+
+void TypeItem::execute() const
 {
     std::string new_type;
-    const std::vector<std::string>& allowed_types = data_pool_.get_allowed_types();
+    const std::array<std::string, 3>& allowed_types = data_pool_.get_allowed_types();
 
     std::cout << "\nEnter type for vector:\n" << std::endl;
     std::cin >> new_type;
-    parse_input(new_type);
+    fix_input(new_type);
 
     if(std::find(allowed_types.begin(), allowed_types.end(), new_type) == allowed_types.end())
     {
-        //Invalid type (couldn't find input_type in allowed types list)
         throw std::invalid_argument("Invalid type value!");
     }
     else
     {
-        current_type = new_type;
+        data_pool_.set_current_input_type(new_type);
     }
 
     std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
     std::cout << "\nType for the vector was entered.\n" << std::endl; 
 }
 
-void Menu::input_vector()
+//VectorItem
+VectorItem::VectorItem(DataPool& data_pool) : data_pool_(data_pool){}
+
+void VectorItem::execute() const
 {
+    const std::string& current_type = data_pool_.get_current_input_type();
+
     if (current_type.empty())
     {
         throw std::logic_error("Type is not entered!");
@@ -212,7 +144,10 @@ void Menu::input_vector()
     std::cout << "\nVector added successfully!\n" << std::endl;
 }
 
-void Menu::print_settings() const
+//SettingsItem
+SettingsItem::SettingsItem(AppSettings& app_settings) : app_settings_(app_settings){}
+
+void SettingsItem::execute() const
 {
     std::cout << "\nApp settings: \n"
               << "Name -\t\t" << app_settings_.get_name() <<std::endl
@@ -223,27 +158,35 @@ void Menu::print_settings() const
               << "Library -\t" << app_settings_.get_library() << std::endl;
 }
 
-void Menu::print_help() const
+//HelpItem
+void HelpItem::execute() const
 {
     std::cout << "\nName -\t\tenter name for the program;\n"
-              << "Type -\t\tenter type of the vector;\n"
-              << "Vector -\tenter 4-d int vector;\n"
-              << "Vectors -\tshow entered vectors\n"
-              << "Settings -\tshow app settings arguments\n"
-              << "Help -\t\tshow available commands\n"
-              << "Exit -\t\texit the program\n"
-              << "Send -\t\tsend the first vector in data pool to server\n"
-              << "\nWarning! No multiple values are allowed in one string except for 4-d vector values! (cin.ignore used).\n"
-              << std::endl;
+            << "Type -\t\tenter type of the vector;\n"
+            << "Vector -\tenter 4-d int vector;\n"
+            << "Vectors -\tshow entered vectors\n"
+            << "Settings -\tshow app settings arguments\n"
+            << "Help -\t\tshow available commands\n"
+            << "Exit -\t\texit the program\n"
+            << "Send -\t\tsend the first vector in data pool to server\n"
+            << "\nWarning! No multiple values are allowed in one string except for 4-d vector values! (cin.ignore used).\n"
+            << std::endl;
 }
 
-void Menu::print_vectors() const
+//VectorsItem
+VectorsItem::VectorsItem(DataPool& data_pool) : data_pool_(data_pool){}
+
+void VectorsItem::execute() const
 {
     data_pool_.print_vectors();
 }
 
-void Menu::send_vector()
+//SendItem
+SendItem::SendItem(Client& client, DataPool& data_pool) : client_(client), data_pool_(data_pool){}
+
+void SendItem::execute() const
 {
+    const std::string& current_type = data_pool_.get_current_input_type();
     client_.get_vect(data_pool_.first());
 
     std::unique_ptr<BaseVector> received;
@@ -274,60 +217,47 @@ void Menu::send_vector()
     }
 }
 
-void Menu::exit()
+//ExitQuitItem
+ExitQuitItem::ExitQuitItem(bool& menu_flag) : menu_flag_(menu_flag){}
+
+void ExitQuitItem::execute() const
 {
     std::cout << "\nExit from the menu\n" << std::endl;
     menu_flag_ = false;
 }
+//Menu
+Menu::Menu(Logger& logger, bool& running) : logger_(logger), running_(running) {}
 
-//Чем конкретно должно отличаться от exit????????
-void Menu::quit()
+void Menu::add_item(const std::string& command, std::unique_ptr<MenuItem> item)
 {
-    std::cout << "\nQuit from the menu\n" << std::endl;
-    exit();
-}
-
-void Menu::parse_input(std::string& command)
-{
-    std::string result;
-    for (char c : command)
-    {
-        if (std::isalnum(static_cast<unsigned char>(c)))
-        {
-            result += std::tolower(static_cast<unsigned char>(c));
-        }
-    }
-    command = result;
+    items_[command] = std::move(item);
 }
 
 void Menu::show_menu()
 {
-    std::string new_command;
+    MenuItem* help_item = find_item("help");
+    if (help_item)
+    {
+        help_item->execute();
+    }
 
-    std::cout << "\nEnter one of the following commands:";
-
-    print_help();
-
-    while(menu_flag_)
+    while (running_)
     {
         std::cout << "\nEnter new command:\n" << std::endl;
-        std::cin >> new_command;
-        parse_input(new_command);
-        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');  
+        std::string cmd;
+        std::cin >> cmd;
+        fix_input(cmd);
+        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
 
-        MenuItem* item = find_item(new_command);
+        MenuItem* item = find_item(cmd);
         try
         {
-            if(item)
-            {
+            if (item)
                 item->execute();
-            }
             else
-            {
                 throw std::invalid_argument("Invalid command!");
-            }
         }
-        catch(std::exception& ex)
+        catch (std::exception& ex)
         {
             logger_.simple_console_log(ex);
             logger_.file_log(ex);
@@ -337,10 +267,13 @@ void Menu::show_menu()
 
 MenuItem* Menu::find_item(const std::string& command)
 {
-    auto pair = menu_items_.find(command);
-    if (pair != menu_items_.end())
+    auto it = items_.find(command);
+    if(it != items_.end())
     {
-        return pair->second.get();
+        return it->second.get();
     }
-    return nullptr;
+    else
+    {
+        return nullptr;
+    }
 }

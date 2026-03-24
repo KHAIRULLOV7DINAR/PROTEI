@@ -1,5 +1,4 @@
-#ifndef APPSETTINGS_H
-#define APPSETTINGS_H
+#pragma once
 
 #include <string>
 #include <vector>
@@ -22,7 +21,7 @@ public:
     ~AppSettings() = default;
 
     // Геттеры
-    const std::vector<unsigned char>& get_ip() const;
+    const std::array<std::byte, 4>& get_ip() const;
     unsigned short get_port() const;
     NetworkAddress& get_network_address() const;
     std::string get_role() const;
@@ -55,5 +54,3 @@ private:
     void parse_i();
     void parse_console_string();
 };
-
-#endif

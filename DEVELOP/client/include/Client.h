@@ -1,5 +1,4 @@
-#ifndef CLIENT_H
-#define CLIENT_H
+#pragma once
 
 #include "NetworkAddress.h"
 #include "DataPool.h"
@@ -17,10 +16,9 @@ public:
 private:
     NetworkAddress& network_address_;
     int server_socket_;
+    std::string buffer_;
 
     void set_up_server_connection();
     void send_raw_data(const void* data, size_t length);
     std::string receive_raw_data();
 };
-
-#endif

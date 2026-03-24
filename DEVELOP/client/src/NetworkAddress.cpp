@@ -2,16 +2,16 @@
 #include <sstream>
 #include <cstdint>
 #include <iostream>
+#include <stdexcept>
 
 #include "../include/NetworkAddress.h"
-
 
 const std::string& NetworkAddress::get_str_ip() const
 {
     return str_ip_;
 }
 
-const std::vector<unsigned char>& NetworkAddress::get_ip() const
+const std::array<std::byte, 4>& NetworkAddress::get_ip() const
 {
     return ip_;
 }
@@ -25,14 +25,18 @@ void NetworkAddress::set_ip(const std::string& str_ip)
 {
     str_ip_ = str_ip;
 
-    std::vector<unsigned char> new_ip;
-
+    std::array<std::byte, 4> new_ip{};
     std::stringstream ss_ip(str_ip);
     std::string oct;
+    int index = 0;
 
-    while(std::getline(ss_ip, oct, '.'))
+    while (std::getline(ss_ip, oct, '.'))
     {
-        //exception could be thrown in stoi func. In that case it's gonna be caught in main func.
+        if (index >= 4)
+        {
+            throw std::invalid_argument("Invalid ip-address: too many octets!");
+        }
+
         size_t pos;
         int int_oct = std::stoi(oct, &pos);
         if (pos != oct.length())
@@ -40,63 +44,52 @@ void NetworkAddress::set_ip(const std::string& str_ip)
             throw std::invalid_argument("Invalid symbols in ip-oct value!");
         }
 
-        if(0 <= int_oct && int_oct <= 255)
-        {
-            new_ip.push_back(static_cast<unsigned char>(int_oct));
-        }
-        else
+        if (int_oct < 0 || int_oct > 255)
         {
             throw std::invalid_argument("Invalid ip-address octet value!");
         }
+
+        new_ip[index] = static_cast<std::byte>(int_oct);
+        ++index;
     }
 
-    if(new_ip.size() != 4)
+    if (index != 4)
     {
-        throw std::invalid_argument("Invalid ip-address format!");
+        throw std::invalid_argument("Invalid ip-address: wrong number of octets!");
     }
 
-    ip_.clear();
     ip_ = new_ip;
 }
 
 void NetworkAddress::set_ip(const std::vector<int>& vec_ip)
 {
-    if(vec_ip.size() != 4)
+    if (vec_ip.size() != 4)
     {
         throw std::invalid_argument("Invalid ip-address format!");
     }
 
-    std::vector<unsigned char> new_ip;
-
-    for(int int_oct : vec_ip)
+    for (size_t i = 0; i < 4; ++i)
     {
-        if(0 > int_oct || int_oct > 255)
+        int int_oct = vec_ip[i];
+        if (int_oct < 0 || int_oct > 255)
         {
-            throw std::invalid_argument("Invalid ip-octect value!");
+            throw std::invalid_argument("Invalid ip-octet value!");
         }
-        new_ip.push_back(static_cast<unsigned char>(int_oct));
+        ip_[i] = static_cast<std::byte>(int_oct);
     }
-
-    ip_.clear();
-    ip_ = new_ip;
 }
 
 void NetworkAddress::set_ip(unsigned int hex_ip)
 {
-    std::vector<unsigned char> new_ip;
-
-    new_ip.push_back(static_cast<unsigned char>((hex_ip >> 24) & 0xFF));
-    new_ip.push_back(static_cast<unsigned char>((hex_ip >> 16) & 0xFF));
-    new_ip.push_back(static_cast<unsigned char>((hex_ip >> 8) & 0xFF));
-    new_ip.push_back(static_cast<unsigned char>(hex_ip & 0xFF));
-
-    ip_.clear();
-    ip_ = new_ip;
+    ip_[0] = static_cast<std::byte>((hex_ip >> 24) & 0xFF);
+    ip_[1] = static_cast<std::byte>((hex_ip >> 16) & 0xFF);
+    ip_[2] = static_cast<std::byte>((hex_ip >> 8) & 0xFF);
+    ip_[3] = static_cast<std::byte>(hex_ip & 0xFF);
 }
 
 void NetworkAddress::set_port(int port)
 {
-    if(0 > port || port > 65535)
+    if (port < 0 || port > 65535)
     {
         throw std::invalid_argument("Invalid port!");
     }

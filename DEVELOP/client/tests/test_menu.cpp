@@ -62,15 +62,15 @@ protected:
 TEST_F(MenuTestFixture, EnterCommandTest1)
 {
     std::string new_command = "e x \nit";
-    menu->parse_input(new_command);
+    menu->fix_input(new_command);
     EXPECT_EQ("exit", new_command);
 
     new_command = "!@#$%^&*()_+";
-    menu->parse_input(new_command);
+    menu->fix_input(new_command);
     EXPECT_EQ("", new_command);
 
     new_command = "TY  \t!  p E";
-    menu->parse_input(new_command);
+    menu->fix_input(new_command);
     EXPECT_EQ("type", new_command);
 }
 

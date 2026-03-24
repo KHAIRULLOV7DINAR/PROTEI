@@ -1,18 +1,46 @@
-#include "../include/Logger.h"
+#include <filesystem>
+#include <chrono>
+#include <iomanip>
+#include <sstream>
+
+#include "Logger.h"
 
 
-Logger::Logger(const std::string& filename)
+static void ensure_log_directory()
 {
-    file_.open(filename, std::ios::app);
-}
-
-Logger::~Logger()
-{
-    if (file_.is_open())
+    std::filesystem::path log_dir("../logs");
+    if (!std::filesystem::exists(log_dir))
     {
-        file_.close();
+        std::filesystem::create_directory(log_dir);
     }
 }
+
+std::string Logger::generate_log_filename()
+{
+    auto now = std::chrono::system_clock::now();
+    auto time_t_now = std::chrono::system_clock::to_time_t(now);
+    auto tm = *std::localtime(&time_t_now);
+
+    std::ostringstream oss;
+    oss << std::put_time(&tm, "../logs/log_%Y-%m-%d_%H-%M-%S.txt");
+    return oss.str();
+}
+
+void Logger::open_file(const std::string& filename)
+{
+    ensure_log_directory();
+    file_.open(filename, std::ios::app);
+    if (!file_.is_open())
+    {
+        std::cerr << "Failed to open log file: " << filename << std::endl;
+    }
+}
+
+Logger::Logger()
+{
+    open_file(generate_log_filename());
+}
+
 
 void Logger::file_log(const std::string& message)
 {
