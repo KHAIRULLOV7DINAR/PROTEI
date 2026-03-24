@@ -186,8 +186,11 @@ SendItem::SendItem(Client& client, DataPool& data_pool) : client_(client), data_
 
 void SendItem::execute() const
 {
-    const std::string& current_type = data_pool_.get_current_input_type();
-    client_.get_vect(data_pool_.first());
+    std::unique_ptr<BaseVector> first_vect = data_pool_.first();
+    const std::string& current_type = first_vect->get_type();
+
+    client_.get_vect(std::move(first_vect));
+
 
     std::unique_ptr<BaseVector> received;
     
